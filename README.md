@@ -1,1 +1,1 @@
-# qs-advanced-calendar
+# qs-intuit-advanced-calendar
