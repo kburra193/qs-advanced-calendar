@@ -14,12 +14,14 @@ export default function ($element, layout) {
   var percentSelected = (qselectedCount / qCardinal) * 100;
   var percentAlternative = 100 - percentSelected;
   var defaultTextNew = "";
-  if(layout.props.customLabelSwitch ==!1 && layout.props.isSingleDate == !0){
+  if (layout.props.customLabelSwitch == !1 && layout.props.isSingleDate == !0) {
     defaultTextNew = layout.props.defaultText[1];
-  }else if(layout.props.customLabelSwitch ==!1 && layout.props.isSingleDate == !1) {
+  } else if (
+    layout.props.customLabelSwitch == !1 &&
+    layout.props.isSingleDate == !1
+  ) {
     defaultTextNew = layout.props.defaultText[0];
-  }
-  else if (layout.props.customLabelSwitch ==!0){
+  } else if (layout.props.customLabelSwitch == !0) {
     defaultTextNew = layout.props.customLabel;
   }
   function createDate(num) {
@@ -102,6 +104,11 @@ export default function ($element, layout) {
   // ..paint code here
   var self = this;
   var viewModeNew = layout.props.isDay;
+  if (layout.props.isDay == !1) {
+    var propsoutDateFormat = layout.props.dayFormat;
+  } else if (layout.props.isDay == !0) {
+    var propsoutDateFormat = layout.props.monthFormat;
+  }
   var interactionState = this._interactionState,
     noSelections = !0 === this.options.noSelections,
     sortAscending =
@@ -123,8 +130,8 @@ export default function ($element, layout) {
     qlikDateFormat =
       layout.qListObject.qDimensionInfo.qNumFormat.qFmt ||
       self.app.model.layout.qLocaleInfo.qDateFmt,
-    outDateFormat = layout.props.format || qlikDateFormat;
-    moment.locale(layout.props.locale),
+    outDateFormat = propsoutDateFormat || qlikDateFormat;
+  moment.locale(layout.props.locale),
     (minDate = createMoment(layout.props.minDate, qlikDateFormat)),
     (maxDate = createMoment(layout.props.maxDate, qlikDateFormat)),
     (startDate = createMoment(layout.props.startDate, qlikDateFormat)),
@@ -158,7 +165,7 @@ export default function ($element, layout) {
         return self.dateStates[d] ? "state" + self.dateStates[d] : "nodata";
       },
     };
-    minDate.isValid() && (config.minDate = minDate),
+  minDate.isValid() && (config.minDate = minDate),
     maxDate.isValid() && (config.maxDate = maxDate),
     startDate.isValid()
       ? (config.startDate = startDate)
@@ -321,6 +328,18 @@ export default function ($element, layout) {
       }
     });
 
+  //Display none for Ranges when button is off
+  if (layout.props.CustomRangesEnabled == !1) {
+    $("div.ranges").css("display", "none");
+    $("h3.rangesHeader").css("display", "none");
+  }
+  //Display none for single date
+  if (layout.props.isSingleDate == !0) {
+    $("span.drp-selected-from").css("display", "none");
+    $("span.drp-selected-to").css("display", "none");
+    $("span.separatorfromto").css("display", "none");
+  }
+
   /* Cell Styling*/
   $$scope.qId = layout.qInfo.qId;
   console.log($$scope.qId);
@@ -365,15 +384,50 @@ export default function ($element, layout) {
   border-color: ${layout.props.calendarborderColor.color} !important;
   border-width: ${layout.props.calendarborderWidth}px !important;
 }
-.daterangepicker .calendar-table th{
+.daterangepicker .calendar-table th {
   width: ${layout.props.headerWidth}px !important;
   height: ${layout.props.headerHeight}px !important;
   font-size: ${layout.props.headerfontSize}px !important;
   font-style: ${layout.props.headerfontStyle} !important;
   background-color: ${layout.props.headerBgColor.color} !important;
   color: ${layout.props.headerfontColor.color} !important;
+  border-style: ${layout.props.headerborderType} !important;
+  border-color: ${layout.props.headerborderColor.color} !important;
+  border-width: ${layout.props.headerborderWidth}px !important;
+  border-radius: ${layout.props.headerborderRadius}px !important;
 }
-.daterangepicker.show-calendar .ranges{
+.daterangepicker  .calendar-table td {
+  height: ${layout.props.cellHeight}px !important;
+  font-size:  ${layout.props.cellfontSize}px !important;
+  border-style:  ${layout.props.cellborderType} !important;
+  border-color: ${layout.props.cellborderColor.color} !important;
+  border-width: ${layout.props.cellborderWidth}px !important;
+  border-radius: ${layout.props.cellborderRadius}px !important;
+  background: ${layout.props.possibleBgColor.color};
+  color: ${layout.props.possiblefontColor.color};
+}
+.daterangepicker td.in-range {
+  height: ${layout.props.cellHeight}px !important;
+  font-size:  ${layout.props.cellfontSize}px !important;
+  border-style: ${layout.props.cellborderType} !important;
+  border-color: ${layout.props.cellborderColor.color} !important;
+  border-width: ${layout.props.cellborderWidth}px !important;
+  border-radius: ${layout.props.cellborderRadius}px !important;
+  background: ${layout.props.selectedBgColor.color} !important;
+  color: ${layout.props.selectedfontColor.color} !important;
+}
+.daterangepicker td.active {
+  background: ${layout.props.selectedBgColor.color} !important;
+  color: ${layout.props.selectedfontColor.color} !important;
+  opacity: 1;
+}
+.daterangepicker td.disabled, .daterangepicker option.disabled {
+  background: ${layout.props.excludedBgColor.color} !important;
+  color: ${layout.props.excludedFontColor.color} !important;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.daterangepicker.show-calendar .ranges {
   font-size:  ${layout.props.rangesfontSize}px !important;
   font-weight:  ${layout.props.fontWeight} !important;
   background:  ${layout.props.rangesBgColor.color} !important;
@@ -402,7 +456,8 @@ export default function ($element, layout) {
 //   background-color: ${layout.props.selectedBgColor.color} !important;
 // }
 
-
+// background:  rgb(221, 221, 221) !important;
+// color: rgb(51, 51, 51) !important;
 // .tooltip { position: relative; }
 
 // .tooltip::before {

@@ -231,25 +231,25 @@ export default {
           defaultValue: !1,
         },
         dayFormatType: {
-          ref: "props.format",
+          ref: "props.dayFormat",
           label: "Format Type Select",
           component: "dropdown",
           type: "string",
           options: viewModes.day.dayFormat,
-          defaultValue:viewModes.day.dayFormat[0][0],
+          defaultValue: viewModes.day.dayFormat[0][0],
           show: function (e) {
-            return !e.props.isDay && e.props.format;
+            return !e.props.isDay && e.props.dayFormat;
           },
         },
         monthFormatType: {
-          ref: "props.format",
+          ref: "props.monthFormat",
           label: "Format Type Select",
           component: "dropdown",
           type: "string",
           options: viewModes.month.monthYearFormat,
           defaultValue: viewModes.month.monthYearFormat[0][0],
           show: function (e) {
-            return e.props.isDay && e.props.format;
+            return e.props.isDay && e.props.monthFormat;
           },
         },
         linkedCalendarsSwitch: {
@@ -390,23 +390,6 @@ export default {
                 return e.props.dropdownBgColor;
               },
             },
-            dropdownBorder: {
-              type: "boolean",
-              component: "switch",
-              label: "Border",
-              ref: "props.dropdownBorder",
-              options: [
-                {
-                  value: true,
-                  label: "Enabled",
-                },
-                {
-                  value: false,
-                  label: "Disabled",
-                },
-              ],
-              defaultValue: true,
-            },
             dropdownborderType: {
               ref: "props.dropdownborderType",
               label: "Border Type Select",
@@ -435,9 +418,6 @@ export default {
                 },
               ],
               defaultValue: "solid",
-              show: function (e) {
-                return e.props.dropdownBorder;
-              },
             },
             dropdownborderWidth: {
               type: "number",
@@ -448,9 +428,6 @@ export default {
               max: 5,
               step: 1,
               defaultValue: 1,
-              show: function (e) {
-                return e.props.dropdownBorder;
-              },
             },
             dropdownborderColor: {
               label: "Border Color",
@@ -459,9 +436,6 @@ export default {
               type: "object",
               defaultValue: {
                 color: "#ddd",
-              },
-              show: function (e) {
-                return e.props.dropdownBorder;
               },
             },
             dropdownborderRadius: {
@@ -569,11 +543,69 @@ export default {
               component: "color-picker",
               type: "object",
               defaultValue: {
-                color: "#c9c9c9",
+                color: "#f2f2f2",
               },
               show: function (e) {
                 return e.props.headerBgColor;
               },
+            },
+            headerborderType: {
+              ref: "props.headerborderType",
+              label: "Border Type Select",
+              component: "dropdown",
+              type: "string",
+              options: [
+                {
+                  label: "Solid",
+                  value: "solid",
+                },
+                {
+                  label: "Dotted",
+                  value: "dotted",
+                },
+                {
+                  label: "Dashed",
+                  value: "dashed",
+                },
+                {
+                  label: "Double",
+                  value: "double",
+                },
+                {
+                  label: "None",
+                  value: "none",
+                },
+              ],
+              defaultValue: "solid",
+            },
+            headerborderWidth: {
+              type: "number",
+              component: "slider",
+              label: "Border Width (px)",
+              ref: "props.headerborderWidth",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+             headerborderColor: {
+              label: "Border Color",
+              ref: "props.headerborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+            },
+            headerborderRadius: {
+              type: "number",
+              component: "slider",
+              label: "Border Radius (px)",
+              ref: "props.headerborderRadius",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
             },
           },
         },
@@ -585,6 +617,19 @@ export default {
               component: "text",
               label: `Cell level styling for Calendar:`,
             },
+            cellHeight: {
+              type: "number",
+              component: "slider",
+              label: "Font Size (px)",
+              ref: "props.cellHeight",
+              min: 0,
+              max: 100,
+              step: 1,
+              defaultValue: 45,
+              show: function (e) {
+                return e.props.cellHeight;
+              },
+            },
             cellfontSize: {
               type: "number",
               component: "slider",
@@ -593,27 +638,10 @@ export default {
               min: 0,
               max: 18,
               step: 1,
-              defaultValue: 14,
+              defaultValue: 12,
               show: function (e) {
                 return e.props.cellfontSize;
               },
-            },
-            cellBorder: {
-              type: "boolean",
-              component: "switch",
-              label: "Border",
-              ref: "props.cellBorder",
-              options: [
-                {
-                  value: true,
-                  label: "Enabled",
-                },
-                {
-                  value: false,
-                  label: "Disabled",
-                },
-              ],
-              defaultValue: true,
             },
             cellborderType: {
               ref: "props.cellborderType",
@@ -643,9 +671,6 @@ export default {
                 },
               ],
               defaultValue: "solid",
-              show: function (e) {
-                return e.props.cellBorder;
-              },
             },
             cellborderWidth: {
               type: "number",
@@ -656,9 +681,6 @@ export default {
               max: 5,
               step: 1,
               defaultValue: 1,
-              show: function (e) {
-                return e.props.cellBorder;
-              },
             },
             cellborderColor: {
               label: "Border Color",
@@ -666,11 +688,18 @@ export default {
               component: "color-picker",
               type: "object",
               defaultValue: {
-                color: "#ddd",
+                color: "#fff",
               },
-              show: function (e) {
-                return e.props.cellBorder;
-              },
+            },
+            cellborderRadius: {
+              type: "number",
+              component: "slider",
+              label: "Border Radius (px)",
+              ref: "props.cellborderRadius",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
             },
           },
         },
@@ -688,7 +717,7 @@ export default {
               component: "color-picker",
               type: "object",
               defaultValue: {
-                color: "#fff",
+                color: "#DDDDDD",
               },
               show: function (e) {
                 return e.props.possibleBgColor;
@@ -700,7 +729,7 @@ export default {
               component: "color-picker",
               type: "object",
               defaultValue: {
-                color: "#595959",
+                color: "#333333",
               },
               show: function (e) {
                 return e.props.possiblefontColor;
@@ -712,7 +741,7 @@ export default {
               component: "color-picker",
               type: "object",
               defaultValue: {
-                color: "#009845",
+                color: "#4D9648",
               },
               show: function (e) {
                 return e.props.selectedBgColor;
@@ -800,23 +829,6 @@ export default {
                 return e.props.CalendarBgColor;
               },
             },
-            calendarBorder: {
-              type: "boolean",
-              component: "switch",
-              label: "Border",
-              ref: "props.calendarBorder",
-              options: [
-                {
-                  value: true,
-                  label: "Enabled",
-                },
-                {
-                  value: false,
-                  label: "Disabled",
-                },
-              ],
-              defaultValue: true,
-            },
             calendarborderType: {
               ref: "props.calendarborderType",
               label: "Border Type Select",
@@ -845,9 +857,6 @@ export default {
                 },
               ],
               defaultValue: "solid",
-              show: function (e) {
-                return e.props.calendarBorder;
-              },
             },
             calendarborderWidth: {
               type: "number",
@@ -858,9 +867,6 @@ export default {
               max: 5,
               step: 1,
               defaultValue: 1,
-              show: function (e) {
-                return e.props.calendarBorder;
-              },
             },
             calendarborderColor: {
               label: "Border Color",
@@ -870,9 +876,6 @@ export default {
               defaultValue: {
                 color: "#ddd",
               },
-              show: function (e) {
-                return e.props.calendarBorder;
-              },
             },
             calendarborderColor: {
               label: "Border Color",
@@ -881,9 +884,6 @@ export default {
               type: "object",
               defaultValue: {
                 color: "#ddd",
-              },
-              show: function (e) {
-                return e.props.calendarBorder;
               },
             },
           },
@@ -990,23 +990,6 @@ export default {
                 return e.props.rangesBgColor;
               },
             },
-            rangesBorder: {
-              type: "boolean",
-              component: "switch",
-              label: "Border",
-              ref: "props.rangesBorder",
-              options: [
-                {
-                  value: true,
-                  label: "Enabled",
-                },
-                {
-                  value: false,
-                  label: "Disabled",
-                },
-              ],
-              defaultValue: false,
-            },
             rangesborderType: {
               ref: "props.rangesborderType",
               label: "Border Type Select",
@@ -1035,9 +1018,6 @@ export default {
                 },
               ],
               defaultValue: "none",
-              show: function (e) {
-                return e.props.rangesBorder;
-              },
             },
             rangesborderWidth: {
               type: "number",
@@ -1048,9 +1028,6 @@ export default {
               max: 5,
               step: 1,
               defaultValue: 1,
-              show: function (e) {
-                return e.props.rangesBorder;
-              },
             },
             rangesborderColor: {
               label: "Border Color",
@@ -1059,9 +1036,6 @@ export default {
               type: "object",
               defaultValue: {
                 color: "#ddd",
-              },
-              show: function (e) {
-                return e.props.rangesBorder;
               },
             },
             rangesborderRadius: {
@@ -1073,9 +1047,6 @@ export default {
               max: 5,
               step: 1,
               defaultValue: 1,
-              show: function (e) {
-                return e.props.rangesBorder;
-              },
             },
           },
         },

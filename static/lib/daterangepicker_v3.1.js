@@ -132,7 +132,7 @@
         "<span>" +
         " " +
         "</span>" +
-        "<span>" +
+        '<span class="separatorfromto">' +
         "-" +
         "</span>" +
         "<span>" +
@@ -161,6 +161,7 @@
 
       if (typeof options.locale.format === "string")
         this.locale.format = options.locale.format;
+        console.log("dr js localeforamt",this.locale.format);
 
       if (typeof options.locale.separator === "string")
         this.locale.separator = options.locale.separator;
@@ -194,7 +195,8 @@
     this.container.addClass(this.locale.direction);
 
     if (typeof options.viewMode === "string") this.viewMode = options.viewMode;
-    if (typeof options.linkedCalendars === "string") this.linkedCalendars = options.linkedCalendars;
+    if (typeof options.linkedCalendars === "string")
+      this.linkedCalendars = options.linkedCalendars;
 
     if (typeof options.startDate === "string")
       this.startDate = moment(options.startDate, this.locale.format);
@@ -465,7 +467,6 @@
 
     this.container.addClass("opens" + this.opens);
 
-
     //apply CSS classes and labels to buttons
     this.container.find(".applyBtn, .cancelBtn").addClass(this.buttonClasses);
     if (this.applyButtonClasses.length)
@@ -542,39 +543,34 @@
     // if attached to a text input, set the initial value
     //
     //this.updateElement();
-
-
-
-
-
   };
 
   DateRangePicker.prototype = {
     constructor: DateRangePicker,
-    viewModes : {
-        day: {
-          ordinal: 4,
-          next: "month",
-          prev: "hour",
-          get: "date",
-          duration: "days",
-          monthYearFormat: "MMM YYYY",
-          monthYearColSpan: 5,
-          defaultFormat: "MM/DD/YYYY",
-          cellFormat: "D",
-        },
-        month: {
-          ordinal: 6,
-          next: "year",
-          prev: "day",
-          get: "month",
-          duration: "months",
-          monthYearFormat: "YYYY",
-          monthYearColSpan: 2,
-          defaultFormat: "MMM, YYYY",
-          cellFormat: "MMM"
-        },
+    viewModes: {
+      day: {
+        ordinal: 4,
+        next: "month",
+        prev: "hour",
+        get: "date",
+        duration: "days",
+        monthYearFormat: "MMM YYYY",
+        monthYearColSpan: 5,
+        defaultFormat: "MM/DD/YYYY",
+        cellFormat: "D",
       },
+      month: {
+        ordinal: 6,
+        next: "year",
+        prev: "day",
+        get: "month",
+        duration: "months",
+        monthYearFormat: "YYYY",
+        monthYearColSpan: 2,
+        defaultFormat: "MMM, YYYY",
+        cellFormat: "MMM",
+      },
+    },
     setStartDate: function (startDate) {
       if (typeof startDate === "string")
         this.startDate = moment(startDate, this.locale.format);
@@ -1154,14 +1150,13 @@
           html +=
             '<td class="' +
             cname.replace(/^\s+|\s+$/g, "") +
-            '" data-title="' + 
+            '" data-title="' +
             "r" +
             row +
             "c" +
             col +
             '"  hovertooltipDays="' +
-            '">' + 
-           
+            '">' +
             calendar[row][col].format(
               this.viewModes[this.viewMode].cellFormat
             ) +
@@ -1713,20 +1708,24 @@
               dt.isSame(date, "day")
             ) {
               $(el).addClass("in-range tooltip");
-              var hovertooltipDays = Math.abs(dt.isAfter(startDate) ? dt.diff(startDate, 'day') : dt.isSame(date, 'day'));
+              var hovertooltipDays = Math.abs(
+                dt.isAfter(startDate)
+                  ? dt.diff(startDate, "day")
+                  : dt.isSame(date, "day")
+              );
               //console.log("line 1750 hovertooltipDays",$(el),hovertooltipDays);
-             /*  console.log("classNames",$(el)[0].className);
+              /*  console.log("classNames",$(el)[0].className);
               console.log("attributes class,title,tooltip",$(el)[0].attributes); */
-            //   var NamedNodeMap = $(el)[0].attributes;
-            //   window.w = NamedNodeMap;
-            //   console.log("attributesClassValue",NamedNodeMap[0].value);
-            //   console.log("attributesTitleValue",NamedNodeMap[1].value);
-            //   console.log("attributesHovertooltipValue",NamedNodeMap[2].value);
+              //   var NamedNodeMap = $(el)[0].attributes;
+              //   window.w = NamedNodeMap;
+              //   console.log("attributesClassValue",NamedNodeMap[0].value);
+              //   console.log("attributesTitleValue",NamedNodeMap[1].value);
+              //   console.log("attributesHovertooltipValue",NamedNodeMap[2].value);
               //$(el).attr("hovertooltipdays", $(el).attr("hovertooltipdays") + hovertooltipDays);
-            //   $(el).attr('hovertooltipdays', $(el).attr('hovertooltipdays').replace('',hovertooltipDays));
-            //   console.log("attributesHovertooltipValueNew",NamedNodeMap[2].value);
-            //$(".available in-range").attr('hovertooltipdays', hovertooltipDays);
-            // $(el).attr("hovertooltipdays",hovertooltipDays); 
+              //   $(el).attr('hovertooltipdays', $(el).attr('hovertooltipdays').replace('',hovertooltipDays));
+              //   console.log("attributesHovertooltipValueNew",NamedNodeMap[2].value);
+              //$(".available in-range").attr('hovertooltipdays', hovertooltipDays);
+              // $(el).attr("hovertooltipdays",hovertooltipDays);
             } else {
               $(el).removeClass("in-range");
             }
@@ -1935,17 +1934,19 @@
           year = this.maxDate.year();
         }
       }
-    
+
       if (isLeft) {
         this.leftCalendar.month.month(month).year(year);
         if (this.linkedCalendars)
           this.rightCalendar.month = this.leftCalendar.month
             .clone()
-            .add(1, ("month"));
+            .add(1, "month");
       } else {
         this.rightCalendar.month.month(month).year(year);
         if (this.linkedCalendars)
-            this.leftCalendar.month = this.rightCalendar.month.clone().subtract(1, 'month');
+          this.leftCalendar.month = this.rightCalendar.month
+            .clone()
+            .subtract(1, "month");
       }
       this.updateCalendars();
     },
@@ -2093,8 +2094,6 @@
       this.element.off(".daterangepicker");
       this.element.removeData();
     },
-
-
   };
 
   $.fn.daterangepicker = function (options, callback) {
