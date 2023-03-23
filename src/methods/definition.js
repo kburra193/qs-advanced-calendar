@@ -1,4 +1,5 @@
 var qlik = window.require("qlik");
+import moment from "../../static/lib/moment.min";
 var lastXDays = "Last 30 days";
 var labelName = ["Select date range", "Select date"];
 var viewModes = {
@@ -130,6 +131,31 @@ var viewModes = {
     cellFormat:  "MMM"  
   },
 };
+var first_letters = moment.weekdays().map((x) => x[0]);
+var two_letters = moment.weekdays().map((x) => x.substring(2, 0));
+var three_letters = moment.weekdays().map((x) => x.substring(3, 0));
+//console.log("daysofWeek", first_letters, two_letters, three_letters);
+var daysofWeek = {
+  day1L: [
+    {
+      label: "M",
+      value: first_letters,
+    },
+  ],
+  day2L: [
+    {
+      label: "Mo",
+      value: two_letters,
+    },
+  ],
+  day3L: [
+    {
+      label: "Mon",
+      value: three_letters,
+    },
+  ],
+};
+//console.log("daysofWeek",daysofWeek);
 export default {
   type: "items",
   component: "accordion",
@@ -198,6 +224,17 @@ export default {
             { value: !1, label: "Date interval" },
           ],
           defaultValue: !1,
+        },
+        dayHeaderFormatTypenew: {
+          ref: "props.dayHeaderFormatNew",
+          label: "Day Header Format Type Select",
+          component: "dropdown",
+          type: "string",
+          options: three_letters[0].value,
+          defaultValue: three_letters[0].label,
+          show: function (data) {
+            return data.props.dayHeaderFormatNew;
+          },
         },
         CustomLabelSwitch: {
           type: "boolean",

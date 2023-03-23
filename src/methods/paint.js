@@ -136,7 +136,7 @@ export default function ($element, layout) {
     (maxDate = createMoment(layout.props.maxDate, qlikDateFormat)),
     (startDate = createMoment(layout.props.startDate, qlikDateFormat)),
     (endDate = createMoment(layout.props.endDate, qlikDateFormat)),
-    $("#dropDown_" + layout.qInfo.qId).remove(),
+    // $("#dropDown_" + layout.qInfo.qId).remove(),
     $element.html(
       createHtml(this.dateStates, outDateFormat, layout.props, sortAscending)
     );
@@ -342,7 +342,7 @@ export default function ($element, layout) {
 
   /* Cell Styling*/
   $$scope.qId = layout.qInfo.qId;
-  console.log($$scope.qId);
+  console.log("line345",$$scope.qId);
   /* Additional State Colors Settings*/
   //Additional css logic
   //Additional colors logic
@@ -350,7 +350,7 @@ export default function ($element, layout) {
   if (sheet.length == 0) {
     sheet = document.createElement(`style`);
     sheet.id = `css${layout.qInfo.qId}`;
-    console.log(sheet.id);
+    console.log("line 253 sheetid",sheet.id);
   } else {
     sheet = sheet[0];
   }
@@ -378,13 +378,13 @@ export default function ($element, layout) {
   width: ${layout.props.dropdownBgColor.color}px !important;
 }
 
-.daterangepicker {
+#dropDown_${$$scope.qId}.daterangepicker {
   background-color: ${layout.props.CalendarBgColor.color} !important;
   border-style: ${layout.props.calendarborderType} !important;
   border-color: ${layout.props.calendarborderColor.color} !important;
   border-width: ${layout.props.calendarborderWidth}px !important;
 }
-.daterangepicker .calendar-table th {
+#dropDown_${$$scope.qId}.daterangepicker .calendar-table th {
   width: ${layout.props.headerWidth}px !important;
   height: ${layout.props.headerHeight}px !important;
   font-size: ${layout.props.headerfontSize}px !important;
@@ -396,7 +396,7 @@ export default function ($element, layout) {
   border-width: ${layout.props.headerborderWidth}px !important;
   border-radius: ${layout.props.headerborderRadius}px !important;
 }
-.daterangepicker  .calendar-table td {
+#dropDown_${$$scope.qId}.daterangepicker  .calendar-table td {
   height: ${layout.props.cellHeight}px !important;
   font-size:  ${layout.props.cellfontSize}px !important;
   border-style:  ${layout.props.cellborderType} !important;
@@ -406,7 +406,7 @@ export default function ($element, layout) {
   background: ${layout.props.possibleBgColor.color};
   color: ${layout.props.possiblefontColor.color};
 }
-.daterangepicker td.in-range {
+#dropDown_${$$scope.qId}.daterangepicker td.in-range {
   height: ${layout.props.cellHeight}px !important;
   font-size:  ${layout.props.cellfontSize}px !important;
   border-style: ${layout.props.cellborderType} !important;
@@ -416,18 +416,18 @@ export default function ($element, layout) {
   background: ${layout.props.selectedBgColor.color} !important;
   color: ${layout.props.selectedfontColor.color} !important;
 }
-.daterangepicker td.active {
+#dropDown_${$$scope.qId}.daterangepicker td.active {
   background: ${layout.props.selectedBgColor.color} !important;
   color: ${layout.props.selectedfontColor.color} !important;
   opacity: 1;
 }
-.daterangepicker td.disabled, .daterangepicker option.disabled {
+#dropDown_${$$scope.qId}.daterangepicker td.disabled, .daterangepicker option.disabled {
   background: ${layout.props.excludedBgColor.color} !important;
   color: ${layout.props.excludedFontColor.color} !important;
   cursor: not-allowed;
   text-decoration: line-through;
 }
-.daterangepicker.show-calendar .ranges {
+#dropDown_${$$scope.qId}.daterangepicker.show-calendar .ranges {
   font-size:  ${layout.props.rangesfontSize}px !important;
   font-weight:  ${layout.props.fontWeight} !important;
   background:  ${layout.props.rangesBgColor.color} !important;
@@ -439,7 +439,7 @@ export default function ($element, layout) {
   padding: 5px 12px !important;
   cursor: pointer !important;
 }
-.daterangepicker.show-calendar .drp-buttons {
+#dropDown_${$$scope.qId}.daterangepicker.show-calendar .drp-buttons {
   font-size:  ${layout.props.footerfontSize}px !important;
   background:  ${layout.props.footerBgColor.color} !important;
   border-style: ${layout.props.footerborderType} !important;
