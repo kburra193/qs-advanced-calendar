@@ -45,6 +45,8 @@
       this.element = $(element);
       this.viewMode = options.viewMode;
       this.daysofWeekNew = options.daysofWeekNew;
+      this.selectWeek = false;
+      this.startWeekDay = 0; // 0-Sunday, 1- Monday
       this.startDate = moment().startOf(this.viewMode);
       this.endDate = moment().endOf(this.viewMode);
       this.minDate = false;
@@ -170,8 +172,10 @@
 
         if (typeof options.locale.separator === "string")
           this.locale.separator = options.locale.separator;
+
         if (typeof options.daysofWeekNew === "object")
           this.daysofWeekNew = options.daysofWeekNew;
+
         if (typeof options.locale.daysOfWeek === "object")
           this.locale.daysOfWeek = options.locale.daysOfWeek.slice();
 
@@ -218,8 +222,11 @@
         this.maxDate = moment(options.maxDate, this.locale.format);
 
       this.startDate = this.startDate.startOf(this.viewMode);
+
       this.endDate = this.endDate.endOf(this.viewMode);
+
       if (this.minDate) this.minDate = this.minDate.startOf(this.viewMode);
+
       if (this.maxDate) this.maxDate = this.maxDate.endOf(this.viewMode);
 
       if (typeof options.startDate === "object")
@@ -269,6 +276,12 @@
       if (typeof options.showWeekNumbers === "boolean")
         this.showWeekNumbers = options.showWeekNumbers;
 
+      if (typeof options.selectWeek === "boolean")
+        this.selectWeek = options.selectWeek;
+
+      if (typeof options.startWeekDay === "number")
+        this.startWeekDay = options.startWeekDay;
+
       if (typeof options.showISOWeekNumbers === "boolean")
         this.showISOWeekNumbers = options.showISOWeekNumbers;
 
@@ -292,6 +305,7 @@
         this.singleDatePicker = options.singleDatePicker;
         if (this.singleDatePicker) this.endDate = this.startDate.clone();
       }
+
       if (typeof options.isTwYear === "boolean") {
         this.isTwYear = options.isTwYear;
       }
@@ -645,19 +659,20 @@
 
         this.previousRightTime = this.endDate.clone();
 
-        this.container
-          .find(".drp-selected-from")
-          .html(
-            "<b>From</b>" +
-              ":" +
-              " " +
-              this.startDate.format(this.locale.format)
-          );
-        this.container
-          .find(".drp-selected-to")
-          .html(
-            "<b>To</b>" + ":" + " " + this.endDate.format(this.locale.format)
-          );
+        this.container.find(".drp-selected-from").html(
+          '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
+          "<b>From</b>" +
+            ":" +
+            " " +
+            this.startDate.format(this.locale.format)
+        );
+        this.container.find(".drp-selected-to").html(
+          '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
+          "<b>To</b>" +
+            ":" +
+            " " +
+            this.endDate.format(this.locale.format)
+        );
 
         if (!this.isShowing) this.updateElement();
 
@@ -692,6 +707,7 @@
           this.container
             .find(".drp-selected-from")
             .html(
+              '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
               "<b>From</b>" +
                 ":" +
                 " " +
@@ -700,7 +716,8 @@
           this.container
             .find(".drp-selected-to")
             .html(
-              "<b>To</b>" + ":" + " " + this.endDate.format(this.locale.format)
+              '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
+              "<b>To</b>"  + ":" + " " + this.endDate.format(this.locale.format)
             );
         }
         this.updateMonthsInView();
@@ -1772,6 +1789,8 @@
         //
 
         if (this.endDate || date.isBefore(this.startDate, "day")) {
+          if (this.selectWeek)
+            date = moment(date).startOf("week").add(this.startWeekDay, "days");
           //picking start
           if (this.timePicker) {
             var hour = parseInt(
@@ -1805,6 +1824,8 @@
           //but the time of the end date is before the start date
           this.setEndDate(this.startDate.clone());
         } else {
+          if (this.selectWeek)
+            date = moment(date).endOf("week").add(this.startWeekDay, "days");
           // picking end
           if (this.timePicker) {
             var hour = parseInt(
