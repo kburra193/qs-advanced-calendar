@@ -344,7 +344,6 @@ export default function ($element, layout) {
   //Display none for Ranges when button is off
   if (layout.props.CustomRangesEnabled == !1) {
     $("div.ranges").css("display", "none");
-    $("h3.rangesHeader").css("display", "none");
   }
   //Display none for single date
   if (layout.props.isSingleDate == !0) {
@@ -458,25 +457,3 @@ export default function ($element, layout) {
 }
 `;
 }
-
-// #dropDown_${$$scope.qId}.daterangepicker.in-selection td.in-range {
-//   color: ${layout.props.selectedfontColor.color} !important;
-//   background-color: ${layout.props.selectedBgColor.color} !important;
-// }
-
-// background:  rgb(221, 221, 221) !important;
-// color: rgb(51, 51, 51) !important;
-// .tooltip { position: relative; }
-
-// .tooltip::before {
-//   content: "\2003" attr(class); /* print em-space with class text */
-//   display: inline-block;
-//   position: absolute; bottom: 50%;
-//   background-color: #FFF;
-//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); color: black; padding: 5px; border-radius: 5px;
-//   opacity:0; transition:0.3s; overflow:hidden;
-//   max-width: 100%; /* avoids very long sentences */
-//   pointer-events: none; /* prevents tooltip from firing on pseudo hover */
-// }
-
-// .tooltip:hover::before { opacity:1; bottom: 100%; }
