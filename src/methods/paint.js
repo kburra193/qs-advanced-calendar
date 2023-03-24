@@ -420,8 +420,8 @@ export default function ($element, layout) {
   border-color: ${layout.props.cellborderColor.color} !important;
   border-width: ${layout.props.cellborderWidth}px !important;
   border-radius: ${layout.props.cellborderRadius}px !important;
-  background: ${layout.props.selectedBgColor.color} !important;
-  color: ${layout.props.selectedfontColor.color} !important;
+  background: ${layout.props.selectedBgColor.color};
+  color: ${layout.props.selectedfontColor.color};
 }
 #dropDown_${$$scope.qId}.daterangepicker td.active {
   background: ${layout.props.selectedBgColor.color} !important;
