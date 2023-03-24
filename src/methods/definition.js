@@ -1,5 +1,4 @@
 var qlik = window.require("qlik");
-import moment from "../../static/lib/moment.min";
 var lastXDays = "Last 30 days";
 var labelName = ["Select date range", "Select date"];
 var viewModes = {
@@ -131,31 +130,25 @@ var viewModes = {
     cellFormat:  "MMM"  
   },
 };
-var first_letters = moment.weekdays().map((x) => x[0]);
-var two_letters = moment.weekdays().map((x) => x.substring(2, 0));
-var three_letters = moment.weekdays().map((x) => x.substring(3, 0));
-//console.log("daysofWeek", first_letters, two_letters, three_letters);
-var daysofWeek = {
-  day1L: [
-    {
-      label: "M",
-      value: first_letters,
-    },
-  ],
-  day2L: [
-    {
-      label: "Mo",
-      value: two_letters,
-    },
-  ],
-  day3L: [
-    {
-      label: "Mon",
-      value: three_letters,
-    },
-  ],
+var daysOfWeek = {
+  day: {
+    dayFormat: [
+      {
+        label: "d",
+        value: "d",
+      },
+      {
+        label: "dd",
+        value: "dd",
+      },
+      {
+        label: "ddd",
+        value: "ddd",
+      },
+    ],
+    defaultFormat: "ddd",
+  },
 };
-//console.log("daysofWeek",daysofWeek);
 export default {
   type: "items",
   component: "accordion",
@@ -225,17 +218,6 @@ export default {
           ],
           defaultValue: !1,
         },
-        dayHeaderFormatTypenew: {
-          ref: "props.dayHeaderFormatNew",
-          label: "Day Header Format Type Select",
-          component: "dropdown",
-          type: "string",
-          options: three_letters[0].value,
-          defaultValue: three_letters[0].label,
-          show: function (data) {
-            return data.props.dayHeaderFormatNew;
-          },
-        },
         CustomLabelSwitch: {
           type: "boolean",
           component: "switch",
@@ -276,6 +258,17 @@ export default {
           defaultValue: viewModes.day.dayFormat[0][0],
           show: function (e) {
             return !e.props.isDay && e.props.dayFormat;
+          },
+        },
+        dayFormatHeaderType: {
+          ref: "props.dayheaderFormat",
+          label: "Header Format Type Select",
+          component: "dropdown",
+          type: "string",
+          options: daysOfWeek.day.dayFormat,
+          defaultValue: daysOfWeek.day.dayFormat[0][2],
+          show: function (e) {
+            return !e.props.isDay && e.props.dayheaderFormat;
           },
         },
         monthFormatType: {

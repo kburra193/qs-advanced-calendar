@@ -24,6 +24,18 @@ export default function ($element, layout) {
   } else if (layout.props.customLabelSwitch == !0) {
     defaultTextNew = layout.props.customLabel;
   }
+  var first_letters = moment.weekdays().map((x) => x[0]);
+  var two_letters = moment.weekdays().map((x) => x.substring(2, 0));
+  var three_letters = moment.weekdays().map((x) => x.substring(3, 0));
+  var daysofWeek = layout.props.dayheaderFormat;
+  var daysofWeekNew = "";
+  if (daysofWeek == "d") {
+    daysofWeekNew = first_letters;
+  } else if (daysofWeek == "dd") {
+    daysofWeekNew = two_letters;
+  } else {
+    daysofWeekNew = three_letters;
+  }
   function createDate(num) {
     return moment(86400 * (num - 25569) * 1e3)
       .utc()
@@ -145,6 +157,7 @@ export default function ($element, layout) {
       viewMode: layout.props.isDay ? "month" : "day",
       linkedCalendars: layout.props.linkedCalendars,
       singleDatePicker: layout.props.isSingleDate,
+      daysofWeekNew: daysofWeekNew,
       monthCellFormat: layout.props.monthcellformat,
       preventSelections: noSelections,
       locale: { format: outDateFormat, separator: layout.props.separator },
@@ -342,15 +355,10 @@ export default function ($element, layout) {
 
   /* Cell Styling*/
   $$scope.qId = layout.qInfo.qId;
-  console.log("line345",$$scope.qId);
-  /* Additional State Colors Settings*/
-  //Additional css logic
-  //Additional colors logic
   var sheet = $(`style#css${layout.qInfo.qId}`);
   if (sheet.length == 0) {
     sheet = document.createElement(`style`);
     sheet.id = `css${layout.qInfo.qId}`;
-    console.log("line 253 sheetid",sheet.id);
   } else {
     sheet = sheet[0];
   }

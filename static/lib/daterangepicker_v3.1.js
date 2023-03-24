@@ -44,6 +44,7 @@
       this.parentEl = "body";
       this.element = $(element);
       this.viewMode = options.viewMode;
+      this.daysofWeekNew = options.daysofWeekNew;
       this.startDate = moment().startOf(this.viewMode);
       this.endDate = moment().endOf(this.viewMode);
       this.minDate = false;
@@ -69,7 +70,6 @@
       this.isSelect = false;
       this.opens = "left";
       if (this.element.hasClass("pull-right")) this.opens = "left";
-
       this.drops = "down";
       if (this.element.hasClass("dropup")) this.drops = "up";
 
@@ -85,12 +85,11 @@
         cancelLabel: "Cancel",
         weekLabel: "W",
         customRangeLabel: "Custom Range",
-        daysOfWeek: moment.weekdaysMin(),
+        daysOfWeek: this.daysofWeekNew,
         monthNames: moment.monthsShort(),
         firstDay: moment.localeData().firstDayOfWeek(),
       };
       this.callback = function () {};
-
       //some state information
       this.isShowing = false;
       this.leftCalendar = {};
@@ -108,7 +107,9 @@
         !(options.template instanceof $)
       )
         options.template =
-          '<div id= "dropDown_' + encoder.encodeForHTML(options.id) + '" class="daterangepicker">' +
+          '<div id= "dropDown_' +
+          encoder.encodeForHTML(options.id) +
+          '" class="daterangepicker">' +
           "<div>" +
           "<table>" +
           "<tr>" +
@@ -169,7 +170,8 @@
 
         if (typeof options.locale.separator === "string")
           this.locale.separator = options.locale.separator;
-
+        if (typeof options.daysofWeekNew === "object")
+          this.daysofWeekNew = options.daysofWeekNew;
         if (typeof options.locale.daysOfWeek === "object")
           this.locale.daysOfWeek = options.locale.daysOfWeek.slice();
 
@@ -1704,6 +1706,7 @@
         var rightCalendar = this.rightCalendar;
         var startDate = this.startDate;
         var endDate = this.endDate;
+        var viewModeSelect = this.viewMode;
         if (!this.endDate) {
           this.container
             .find(".drp-calendar tbody td")
@@ -1720,16 +1723,27 @@
                 : rightCalendar.calendar[row][col];
               if (
                 (dt.isAfter(startDate) && dt.isBefore(date)) ||
-                dt.isSame(date, "day")
+                dt.isSame(date, this.viewMode)
               ) {
-                $(el).addClass("in-range tooltip");
-                var hovertooltipDays = Math.abs(
-                  dt.isAfter(startDate)
-                    ? dt.diff(startDate, "day")
-                    : dt.isSame(date, "day")
+                if (viewModeSelect == "day") {
+                  var hovertooltipDays = Math.abs(
+                    dt.isAfter(startDate)
+                      ? dt.diff(startDate, "day")
+                      : dt.isSame(date, "day")
+                  );
+                } else if (viewModeSelect == "month") {
+                  var hovertooltipDays = Math.abs(
+                    dt.isAfter(startDate)
+                      ? dt.diff(startDate, "month")
+                      : dt.isSame(date, "month")
+                  );
+                }
+                $(el).addClass("in-range css-tooltip");
+                $(".available in-range").attr("data-tooltip", hovertooltipDays);
+                $(el).attr(
+                  "data-tooltip",
+                  hovertooltipDays + " " + viewModeSelect + "s"
                 );
-                $('.available in-range').attr("my-data", hovertooltipDays);
-                $(el).attr("my-data", hovertooltipDays);
               } else {
                 $(el).removeClass("in-range");
               }
