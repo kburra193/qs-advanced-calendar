@@ -1,6 +1,6 @@
 var qlik = window.require("qlik");
 var lastXDays = "Last 30 days";
-var labelName = ["Select date range", "Select date"];
+var labelName = ["Select Date Range", "Select Date"];
 var viewModes = {
   day: {
     duration: "days",
@@ -210,11 +210,11 @@ export default {
         SingleDateSwitch: {
           type: "boolean",
           component: "switch",
-          label: "Single date / interval",
+          label: "Single Date / Interval",
           ref: "props.isSingleDate",
           options: [
-            { value: !0, label: "Single date" },
-            { value: !1, label: "Date interval" },
+            { value: !0, label: "Single Date" },
+            { value: !1, label: "Date Interval" },
           ],
           defaultValue: !1,
         },
@@ -289,7 +289,7 @@ export default {
           ref: "props.linkedCalendars",
           options: [
             { value: false, label: "Unlink" },
-            { value: true, label: "link" },
+            { value: true, label: "Link" },
           ],
           defaultValue: false,
         },
@@ -323,7 +323,7 @@ export default {
         },
         minDate: {
           ref: "props.minDate",
-          label: "Min date",
+          label: "Min Date",
           type: "string",
           expression: "optional",
           show: function (data) {
@@ -332,7 +332,7 @@ export default {
         },
         maxDate: {
           ref: "props.maxDate",
-          label: "Max date",
+          label: "Max Date",
           type: "string",
           expression: "optional",
           show: function (data) {
@@ -341,7 +341,7 @@ export default {
         },
         startDate: {
           ref: "props.startDate",
-          label: "Start date",
+          label: "Start Date",
           type: "string",
           expression: "optional",
           show: function (data) {
@@ -350,7 +350,7 @@ export default {
         },
         endDate: {
           ref: "props.endDate",
-          label: "End date",
+          label: "End Date",
           type: "string",
           expression: "optional",
           show: function (data) {
