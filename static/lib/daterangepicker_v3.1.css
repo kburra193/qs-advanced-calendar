@@ -196,7 +196,7 @@
 .daterangepicker td.off.in-range,
 .daterangepicker td.off.start-date,
 .daterangepicker td.off.end-date {
-  background-color: #fff !important;
+  background-color: #f2f2f2 !important;
   color: #fff !important;
   cursor: default;
   pointer-events: none !important;
