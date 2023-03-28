@@ -333,6 +333,9 @@
       if (typeof options.isInvalidDate === "function")
         this.isInvalidDate = options.isInvalidDate;
 
+      if (typeof options.isDisableWeekend === "function")
+        this.isDisableWeekend = options.isDisableWeekend;
+
       if (typeof options.isCustomDate === "function")
         this.isCustomDate = options.isCustomDate;
 
@@ -659,20 +662,24 @@
 
         this.previousRightTime = this.endDate.clone();
 
-        this.container.find(".drp-selected-from").html(
-          '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
-          "<b>From</b>" +
-            ":" +
-            " " +
-            this.startDate.format(this.locale.format)
-        );
-        this.container.find(".drp-selected-to").html(
-          '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
-          "<b>To</b>" +
-            ":" +
-            " " +
-            this.endDate.format(this.locale.format)
-        );
+        this.container
+          .find(".drp-selected-from")
+          .html(
+            '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
+              "<b>From</b>" +
+              ":" +
+              " " +
+              this.startDate.format(this.locale.format)
+          );
+        this.container
+          .find(".drp-selected-to")
+          .html(
+            '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
+              "<b>To</b>" +
+              ":" +
+              " " +
+              this.endDate.format(this.locale.format)
+          );
 
         if (!this.isShowing) this.updateElement();
 
@@ -681,6 +688,14 @@
 
       isInvalidDate: function () {
         return false;
+      },
+
+      isDisableWeekend: function (date) {
+        if (date.day() == 0 || date.day() == 6) {
+          return true;
+        } else {
+          return false;
+        }
       },
 
       isCustomDate: function () {
@@ -708,7 +723,7 @@
             .find(".drp-selected-from")
             .html(
               '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
-              "<b>From</b>" +
+                "<b>From</b>" +
                 ":" +
                 " " +
                 this.startDate.format(this.locale.format)
@@ -717,7 +732,10 @@
             .find(".drp-selected-to")
             .html(
               '<b><i class="lui-icon lui-icon--calendar"></i>&nbsp;</b>' +
-              "<b>To</b>"  + ":" + " " + this.endDate.format(this.locale.format)
+                "<b>To</b>" +
+                ":" +
+                " " +
+                this.endDate.format(this.locale.format)
             );
         }
         this.updateMonthsInView();
@@ -1162,6 +1180,10 @@
             if (this.isInvalidDate(calendar[row][col]))
               classes.push("off", "disabled");
 
+            // disable weekends : logic is good but have to see how to use this a switch on UI side and update the count of days on tooltip
+            // if (this.isDisableWeekend(calendar[row][col]))
+            // classes.push("off", "disabled");
+              
             // apply custom classes for this date
             var isCustom = this.isCustomDate(calendar[row][col]);
             if (isCustom !== false) {
