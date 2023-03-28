@@ -1,6 +1,6 @@
 var qlik = window.require("qlik");
 var lastXDays = "Last 30 days";
-var labelName = ["Select Date Range", "Select Date"];
+var labelName = ["Date Range", "Date"];
 var viewModes = {
   day: {
     duration: "days",
