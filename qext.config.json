@@ -1,5 +1,5 @@
 {
-  "extension": "qs-advanced-calendar",
+  "extension": "qs-advanced-filter",
   "output": "./dist",
   "compile": {
     "entry": "./src/index.js",
@@ -7,11 +7,11 @@
     "static": "./static"
   },
   "serverDeploy": {
-    "host": "qmi-qs-d058",
+    "host": "qmi-qs-85eb",
     "prefix": "hdr",
     "isSecure": true,
     "allowSelfSignedSignature": true,
     "hdrAuthHeaderName": "hdr-usr",
-    "hdrAuthUser": "QMI-QS-D058\\qlik"
+    "hdrAuthUser": "QMI-QS-85EB\\qmi"
   }
 }
