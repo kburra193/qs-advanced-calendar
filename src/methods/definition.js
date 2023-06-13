@@ -1,1097 +1,1866 @@
+var qlik = window.require("qlik");
+var lastXDays = "Last 30 days";
+var labelName = ["Date Range", "Date"];
+var viewModes = {
+  day: {
+    duration: "days",
+    dayFormat: [
+      {
+        label: "YYYY/MM/DD",
+        value: "YYYY/MM/DD",
+      },
+      {
+        label: "YYYY.MM.DD",
+        value: "YYYY.MM.DD",
+      },
+      {
+        label: "YYYY-MM-DD",
+        value: "YYYY-MM-DD",
+      },
+      {
+        label: "YYYY/DD/MM",
+        value: "YYYY/DD/MM",
+      },
+      {
+        label: "YYYY.DD.MM",
+        value: "YYYY.DD.MM",
+      },
+      {
+        label: "YYYY-DD-MM",
+        value: "YYYY-DD-MM",
+      },
+
+      {
+        label: "MM/DD/YYYY",
+        value: "MM/DD/YYYY",
+      },
+      {
+        label: "MM.DD.YYYY",
+        value: "MM.DD.YYYY",
+      },
+      {
+        label: "MM-DD-YYYY",
+        value: "MM-DD-YYYY",
+      },
+      {
+        label: "DD/MM/YYYY",
+        value: "DD/MM/YYYY",
+      },
+      {
+        label: "DD.MM.YYYY",
+        value: "DD.MM.YYYY",
+      },
+      {
+        label: "DD-MM-YYYY",
+        value: "DD-MM-YYYY",
+      },
+    ],
+    defaultFormat: "YYYY/MM/DD",
+    cellFormat: "D",
+  },
+  month: {
+    duration: "months",
+    monthYearFormat: [
+      {
+        label: "YYYY/MMM",
+        value: "YYYY/MMM",
+      },
+      {
+        label: "YYYY.MMM",
+        value: "YYYY.MMM",
+      },
+      {
+        label: "YYYY-MMM",
+        value: "YYYY-MMM",
+      },
+      {
+        label: "YYYY,MMM",
+        value: "YYYY,MMM",
+      },
+      {
+        label: "YYYY/MMMM",
+        value: "YYYY/MMMM",
+      },
+      {
+        label: "YYYY.MMMM",
+        value: "YYYY.MMMM",
+      },
+      {
+        label: "YYYY-MMMM",
+        value: "YYYY-MMMM",
+      },
+      {
+        label: "YYYY,MMMM",
+        value: "YYYY,MMMM",
+      },
+      {
+        label: "MMM/YYYY",
+        value: "MMM/YYYY",
+      },
+      {
+        label: "MMM.YYYY",
+        value: "MMM.YYYY",
+      },
+      {
+        label: "MMM-YYYY",
+        value: "MMM-YYYY",
+      },
+      {
+        label: "MMM,YYYY",
+        value: "MMM,YYYY",
+      },
+      {
+        label: "MMMM/YYYY",
+        value: "MMMM/YYYY",
+      },
+      {
+        label: "MMMM.YYYY",
+        value: "MMMM.YYYY",
+      },
+      {
+        label: "MMMM-YYYY",
+        value: "MMMM-YYYY",
+      },
+      {
+        label: "MMMM,YYYY",
+        value: "MMMM,YYYY",
+      },
+    ],
+    defaultFormat: "YYYY/MMM",
+    cellFormat:  "MMM"  
+  },
+};
+var daysOfWeek = {
+  day: {
+    dayFormat: [
+      {
+        label: "d",
+        value: "d",
+      },
+      {
+        label: "dd",
+        value: "dd",
+      },
+      {
+        label: "ddd",
+        value: "ddd",
+      },
+    ],
+    defaultFormat: "ddd",
+  },
+};
 export default {
   type: "items",
   component: "accordion",
   items: {
-      dimensions: {
-          type: "items",
-          label: "Dimension",
-          ref: "qListObjectDef",
-          itemTitleRef: function(data) {
-              return data.fieldLabel ?
-                  data.fieldLabel :
-                  data.qListObjectDef.qDef.qFieldDefs[0];
+    dimension: {
+      type: "items",
+      label: "Field",
+      min: 1,
+      max: 1,
+      items: {
+        field: {
+          type: "string",
+          ref: "qListObjectDef.qDef.qFieldDefs.0",
+          label: "Date field",
+          component: "dropdown",
+          options: function () {
+            return qlik
+              .currApp()
+              .createGenericObject({ qFieldListDef: { qType: "variable" } })
+              .then(function (reply) {
+                return reply.layout.qFieldList.qItems
+                  .filter(function (item) {
+                    return item.qTags && item.qTags.indexOf("$date") > -1;
+                  })
+                  .map(function (item) {
+                    return { value: item.qName, label: item.qName };
+                  });
+              });
           },
-          items: {
-            aboutdimSettings: {
-              component: "text",
-              label: `Pick one dimension field first!
-              Use dimension field label option for custom label.
-              Use UI type for listbox, dropdown or button group.`
+          show: function (data) {
+            return !data.advanced;
           },
-              field: {
-                  type: "string",
-                  expression: "always",
-                  expressionType: "dimension",
-                  ref: "qListObjectDef.qDef.qFieldDefs.0",
-                  label: "Field"
-              },
-              fieldLabel: {
-                  type: "string",
-                  expression: "optional",
-                  ref: "fieldLabel",
-                  label: "Label",
-              },
-              frequency: {
-                  type: "string",
-                  component: "dropdown",
-                  label: "Frequency Mode",
-                  ref: "qListObjectDef.qFrequencyMode",
-                  options: [{
-                          value: "N",
-                          label: "No frequency",
-                      },
-                      {
-                          value: "V",
-                          label: "Absolute value",
-                      },
-                      {
-                          value: "P",
-                          label: "Percent",
-                      },
-                      {
-                          value: "R",
-                          label: "Relative",
-                      },
-                  ],
-                  defaultValue: "N",
-              },
-              ui: {
-                  type: "string",
-                  component: "dropdown",
-                  label: "UI Type",
-                  ref: "ui",
-                  options: [{
-                          value: "listbox",
-                          label: "Listbox",
-                      },
-                      {
-                          value: "dropdown",
-                          label: "Dropdown",
-                      },
-                      {
-                          value: "buttongroup",
-                          label: "Button Group",
-                      },
-                  ],
-                  defaultValue: "listbox",
-              },
+          change: function (data) {
+            var field = data.qListObjectDef.qDef.qFieldDefs[0];
+            (data.props.minDate = {
+              qStringExpression: "=Min( {1} [" + field + "])",
+            }),
+              (data.props.maxDate = {
+                qStringExpression: "=Max( {1} [" + field + "])",
+              }),
+              (data.props.startDate = {
+                qStringExpression: "=Min([" + field + "])",
+              }),
+              (data.props.endDate = {
+                qStringExpression: "=Max([" + field + "])",
+              });
+              (data.props.customminDate = {
+                qStringExpression: "",
+              }),
+              (data.props.custommaxDate = {
+                qStringExpression: "",
+              });
+              (data.props.defaultselectionminDate = {
+                qStringExpression: "",
+              });
+              (data.props.defaultselectionmaxDate = {
+                qStringExpression: "",
+              });
+              
           },
-      },
-      sorting: {
-          type: "items",
-          translation: "properties.sorting",
-          schemaIgnore: !0,
-          items: {
-              autoSort: {
-                  ref: "qListObjectDef.qDef.autoSort",
-                  type: "boolean",
-                  translation: "properties.sorting",
-                  component: "switch",
-                  defaultValue: !0,
-                  options: [{
-                          value: !0,
-                          translation: "Common.Auto",
-                      },
-                      {
-                          value: !1,
-                          translation: "Common.Custom",
-                      },
-                  ],
-                  change(t, e) {
-                      if (t.qListObjectDef.qDef.autoSort)
-                          return e.autoSortDimension(t.qListObjectDef);
-                  },
-              },
-              dimension: {
-                  component: "sorting-dimension",
-                  ref: "qListObjectDef",
-                  show: (t) => !t.qListObjectDef.qDef.autoSort,
-                  sortingItems: {
-                      state: !0,
-                      expression: !0,
-                      frequency: !0,
-                      numeric: !0,
-                      ascii: !0,
-                  },
-              },
+        },
+        fieldAdvanced: {
+          type: "string",
+          ref: "qListObjectDef.qDef.qFieldDefs.0",
+          label: "Date field",
+          expression: "always",
+          expressionType: "dimension",
+          show: function (data) {
+            return data.advanced;
           },
-      },
-      appearance: {
-          uses: "settings",
-          items: {
-              HeaderSettings: {
-                  type: "items",
-                  label: "Header Settings",
-                  items: {
-                      HeaderShow: {
-                          type: "boolean",
-                          component: "switch",
-                          label: "Header",
-                          ref: "HeaderShow",
-                          options: [{
-                                  value: true,
-                                  label: "On",
-                              },
-                              {
-                                  value: false,
-                                  label: "Off",
-                              },
-                          ],
-                          defaultValue: true,
-                      },
-                      HeaderColor: {
-                          type: "boolean",
-                          component: "switch",
-                          label: "Color",
-                          ref: "HeaderColorSwitch",
-                          options: [{
-                                  value: false,
-                                  label: "Custom",
-                              },
-                              {
-                                  value: true,
-                                  label: "Auto",
-                              },
-                          ],
-                          defaultValue: false,
-                      },
-                      HeaderActiveColor: {
-                          label: "Active Color",
-                          ref: "HeaderActiveColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#595959",
-                          },
-                          show: function(e) {
-                              return !e.HeaderColorSwitch;
-                          },
-                      },
-                      HeaderBgColor: {
-                          label: "Header Background Color",
-                          type: "string",
-                          ref: "HeaderBgColor",
-                      },
-                      HeaderFontsizeSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Header Font Size (px)",
-                          ref: "HeaderFontsize",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 13,
-                          show: function(e) {
-                              return e.HeaderFontsize;
-                          },
-                      },
-                      HeaderFontFamilyLui: {
-                          ref: "HeaderFontFamilySelect",
-                          label: "Font Family Select",
-                          component: "dropdown",
-                          type: "string",
-                          options: [{
-                                  label: "QlikView Sans, sans-serif",
-                                  value: "QlikView Sans, sans-serif",
-                              },
-                              {
-                                  label: "Arial",
-                                  value: "Arial",
-                              },
-                              {
-                                  label: "Helvetica",
-                                  value: "Helvetica",
-                              },
-                              {
-                                  label: "Tahoma",
-                                  value: "Tahoma",
-                              },
-                              {
-                                  label: "Verdana",
-                                  value: "Verdana",
-                              },
-                              {
-                                  label: "Comic Sans MS",
-                                  value: "Comic Sans MS",
-                              },
-                              {
-                                  label: "Times New Roman",
-                                  value: "Times New Roman",
-                              },
-                              {
-                                  label: "Courier New",
-                                  value: "Courier New",
-                              },
-                              {
-                                  label: "Define your own",
-                                  value: "own",
-                              },
-                          ],
-                          defaultValue: "QlikView Sans, sans-serif",
-                      },
-                      HeaderFontStyle: {
-                          ref: "HeaderFontStyle",
-                          translation: "Font Style",
-                          type: "string",
-                          component: "dropdown",
-                          options: [{
-                                  value: "normal",
-                                  label: "Normal"
-                              },
-                              {
-                                  value: "bold",
-                                  label: "Bold"
-                              },
-                              {
-                                  value: "italic",
-                                  label: "Italic"
-                              },
-                              {
-                                  value: "underline",
-                                  label: "Underline"
-                              },
-                          ],
-                          defaultValue: "bold",
-                      },
-                      HeaderAlign: {
-                          ref: "HeaderAlign",
-                          expression: "optional",
-                          translation: "Align",
-                          type: "string",
-                          component: "dropdown",
-                          options: [{
-                                  value: "left",
-                                  label: "left",
-                              },
-                              {
-                                  value: "center",
-                                  label: "center",
-                              },
-                              {
-                                  value: "right",
-                                  label: "right",
-                              },
-                          ],
-                          defaultValue: "left",
-                      },
-                  },
-              },
-              CellSettings: {
-                  type: "items",
-                  label: "Cell Settings",
-                  items: {
-                      aboutcellSettings: {
-                          component: "text",
-                          label: `Cell level styling for Listbox/Dropdown:`,
-                      },
-                      ListItemHeightSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Height (px)",
-                          ref: "ListItemHeight",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 30,
-                          show: function(e) {
-                              return e.ListItemHeight;
-                          },
-                      },
-                      ListItemFontsizeSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Font Size (px)",
-                          ref: "ListItemFontsize",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 13,
-                          show: function(e) {
-                              return e.ListItemFontsize;
-                          },
-                      },
-                      ListItemFontFamilyLui: {
-                          ref: "ListItemFontFamilySelect",
-                          label: "Font Family Select",
-                          component: "dropdown",
-                          type: "string",
-                          options: [{
-                                  label: "QlikView Sans, sans-serif",
-                                  value: "QlikView Sans, sans-serif",
-                              },
-                              {
-                                  label: "Arial",
-                                  value: "Arial",
-                              },
-                              {
-                                  label: "Helvetica",
-                                  value: "Helvetica",
-                              },
-                              {
-                                  label: "Tahoma",
-                                  value: "Tahoma",
-                              },
-                              {
-                                  label: "Verdana",
-                                  value: "Verdana",
-                              },
-                              {
-                                  label: "Comic Sans MS",
-                                  value: "Comic Sans MS",
-                              },
-                              {
-                                  label: "Times New Roman",
-                                  value: "Times New Roman",
-                              },
-                              {
-                                  label: "Courier New",
-                                  value: "Courier New",
-                              },
-                              {
-                                  label: "Define your own",
-                                  value: "own",
-                              },
-                          ],
-                          defaultValue: "QlikView Sans, sans-serif",
-                      },
-                      ListItemFontStyle: {
-                          ref: "ListItemFontStyle",
-                          translation: "Font Style",
-                          type: "string",
-                          component: "dropdown",
-                          options: [{
-                                  value: "normal",
-                                  label: "Normal"
-                              },
-                              {
-                                  value: "bold",
-                                  label: "Bold"
-                              },
-                              {
-                                  value: "italic",
-                                  label: "Italic"
-                              },
-                              {
-                                  value: "underline",
-                                  label: "Underline"
-                              },
-                          ],
-                          defaultValue: "normal",
-                      },
-                      ListItemAlign: {
-                          ref: "ListItemAlign",
-                          expression: "optional",
-                          translation: "Align",
-                          type: "string",
-                          component: "dropdown",
-                          options: [{
-                                  value: "left",
-                                  label: "left",
-                              },
-                              {
-                                  value: "center",
-                                  label: "center",
-                              },
-                              {
-                                  value: "right",
-                                  label: "right",
-                              },
-                          ],
-                          defaultValue: "left",
-                      },
-                      ListItemBorder: {
-                          type: "boolean",
-                          component: "switch",
-                          label: "Border",
-                          ref: "ListItemBorderSwitch",
-                          options: [{
-                                  value: true,
-                                  label: "Enabled",
-                              },
-                              {
-                                  value: false,
-                                  label: "Disabled",
-                              },
-                          ],
-                          defaultValue: true,
-                      },
-                      ListItemBorderType: {
-                          ref: "ListItemBorderType",
-                          label: "Border Type Select",
-                          component: "dropdown",
-                          type: "string",
-                          options: [{
-                                  label: "Solid",
-                                  value: "solid",
-                              },
-                              {
-                                  label: "Dotted",
-                                  value: "dotted",
-                              },
-                              {
-                                  label: "Dashed",
-                                  value: "dashed",
-                              },
-                              {
-                                  label: "Double",
-                                  value: "double",
-                              },
-                              {
-                                  label: "None",
-                                  value: "none",
-                              },
-                          ],
-                          defaultValue: "solid",
-                          show: function(e) {
-                              return e.ListItemBorderSwitch;
-                          },
-                      },
-                      ListItemBorderWidth: {
-                          type: "number",
-                          component: "slider",
-                          label: "Border Width (px)",
-                          ref: "ListItemBorderWidth",
-                          min: 0,
-                          max: 5,
-                          step: 1,
-                          defaultValue: 1,
-                          show: function(e) {
-                              return e.ListItemBorderSwitch;
-                          },
-                      },
-                      ListItemBorderColor: {
-                          label: "Border Color",
-                          ref: "ListItemBorderColor",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#ddd",
-                          },
-                          show: function(e) {
-                              return e.ListItemBorderSwitch;
-                          },
-                      },
-                  },
-              },
-              DropdownSettings: {
-                  type: "items",
-                  label: "Dropdown Settings",
-                  items: {
-                      DropdownHeightSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Height (px)",
-                          ref: "DropdownHeight",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 30,
-                          show: function(e) {
-                              return e.DropdownHeight;
-                          },
-                      },
-                      DropdownWidthSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Width (%)",
-                          ref: "DropdownWidth",
-                          min: 0,
-                          max: 100,
-                          step: 10,
-                          defaultValue: 100,
-                          show: function(e) {
-                              return e.DropdownWidth;
-                          },
-                      },
-                      DropdownBackgroundColor: {
-                        label: "Background Color",
-                        ref: "DropdownBgColorPicker",
-                        component: "color-picker",
-                        type: "object",
-                        defaultValue: {
-                            color: "#fff",
-                        },
-                        show: function(e) {
-                            return e.DropdownBgColorPicker;
-                        },
-                    },
-                  },
-              },
-              ButtonGroupSettings: {
-                  type: "items",
-                  label: "Button Group Settings",
-                  items: {
-                      BtnFontsizeSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Font Size (px)",
-                          ref: "BtnFontsize",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 13,
-                          show: function(e) {
-                              return e.BtnFontsize;
-                          },
-                      },
-                      BtnHeightSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Height (px)",
-                          ref: "BtnHeight",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 28,
-                          show: function(e) {
-                              return e.BtnHeight;
-                          },
-                      },
-                      BtnOrientation: {
-                          type: "string",
-                          component: "buttongroup",
-                          label: "Orientation",
-                          ref: "BtnOrientation",
-                          options: [{
-                                  value: "inline",
-                                  label: "Horizontal",
-                                  tooltip: "Select for horizontal",
-                              },
-                              {
-                                  value: "block",
-                                  label: "Vertical",
-                                  tooltip: "Select for vertical",
-                              },
-                          ],
-                          defaultValue: "inline",
-                      },
-                      BtnSpacingSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Spacing (px)",
-                          ref: "BtnSpacing",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 3,
-                          show: function(e) {
-                              return e.BtnSpacing;
-                          },
-                      },
-                      BtnGrouped: {
-                          items: {
-                              MyCheckProp: {
-                                  type: "boolean",
-                                  label: "Grouped",
-                                  ref: "BtnGrouped",
-                                  defaultValue: false,
-                              },
-                          },
-                      },
-                      BtnFontFamilyLui: {
-                          ref: "BtnFontFamilySelect",
-                          label: "Font Family Select",
-                          component: "dropdown",
-                          type: "string",
-                          options: [{
-                                  label: "QlikView Sans, sans-serif",
-                                  value: "QlikView Sans, sans-serif",
-                              },
-                              {
-                                  label: "Arial",
-                                  value: "Arial",
-                              },
-                              {
-                                  label: "Helvetica",
-                                  value: "Helvetica",
-                              },
-                              {
-                                  label: "Tahoma",
-                                  value: "Tahoma",
-                              },
-                              {
-                                  label: "Verdana",
-                                  value: "Verdana",
-                              },
-                              {
-                                  label: "Comic Sans MS",
-                                  value: "Comic Sans MS",
-                              },
-                              {
-                                  label: "Times New Roman",
-                                  value: "Times New Roman",
-                              },
-                              {
-                                  label: "Courier New",
-                                  value: "Courier New",
-                              },
-                              {
-                                  label: "Define your own",
-                                  value: "own",
-                              },
-                          ],
-                          defaultValue: "QlikView Sans, sans-serif",
-                      },
-                      BtnFontStyle: {
-                          ref: "BtnFontStyle",
-                          translation: "Font Style",
-                          type: "string",
-                          component: "dropdown",
-                          options: [{
-                                  value: "normal",
-                                  label: "Normal"
-                              },
-                              {
-                                  value: "bold",
-                                  label: "Bold"
-                              },
-                              {
-                                  value: "italic",
-                                  label: "Italic"
-                              },
-                              {
-                                  value: "underline",
-                                  label: "Underline"
-                              },
-                          ],
-                          defaultValue: "normal",
-                      },
-                      BtnBorder: {
-                          type: "boolean",
-                          component: "switch",
-                          label: "Border",
-                          ref: "BtnBorderSwitch",
-                          options: [{
-                                  value: true,
-                                  label: "Enabled",
-                              },
-                              {
-                                  value: false,
-                                  label: "Disabled",
-                              },
-                          ],
-                          defaultValue: true,
-                      },
-                      BtnBorderType: {
-                          ref: "BtnBorderType",
-                          label: "Border Type Select",
-                          component: "dropdown",
-                          type: "string",
-                          options: [{
-                                  label: "Solid",
-                                  value: "solid",
-                              },
-                              {
-                                  label: "Dotted",
-                                  value: "dotted",
-                              },
-                              {
-                                  label: "Dashed",
-                                  value: "dashed",
-                              },
-                              {
-                                  label: "Double",
-                                  value: "double",
-                              },
-                              {
-                                  label: "None",
-                                  value: "none",
-                              },
-                          ],
-                          defaultValue: "solid",
-                          show: function(e) {
-                              return e.BtnBorderSwitch;
-                          },
-                      },
-                      BtnBorderWidth: {
-                          type: "number",
-                          component: "slider",
-                          label: "Border Width (px)",
-                          ref: "BtnBorderWidth",
-                          min: 0,
-                          max: 5,
-                          step: 1,
-                          defaultValue: 1,
-                          show: function(e) {
-                              return e.BtnBorderSwitch;
-                          },
-                      },
-                      BtnBorderColor: {
-                          label: "Border Color",
-                          ref: "BtnBorderColor",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#ddd",
-                          },
-                          show: function(e) {
-                              return e.BtnBorderSwitch;
-                          },
-                      },
-                      BtnGlobalRadiusSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Global Radius (px)",
-                          ref: "BtnGlobalRadius",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 20,
-                          show: function(e) {
-                              return e.BtnGlobalRadius;
-                          },
-                      },
-                      BtnTopLeftRadiusSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Top Left Radius (px)",
-                          ref: "BtnTopLeftRadius",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 20,
-                          show: function(e) {
-                              return e.BtnTopLeftRadius;
-                          },
-                      },
-                      BtnTopRightRadiusSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Top Right Radius (px)",
-                          ref: "BtnTopRightRadius",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 20,
-                          show: function(e) {
-                              return e.BtnTopRightRadius;
-                          },
-                      },
-                      BtnBottomRightRadiusSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Bottom Right Radius (px)",
-                          ref: "BtnBottomRightRadius",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 20,
-                          show: function(e) {
-                              return e.BtnBottomRightRadius;
-                          },
-                      },
-                      BtnBottomLeftRadiusSlider: {
-                          type: "number",
-                          component: "slider",
-                          label: "Bottom Left Radius (px)",
-                          ref: "BtnBottomLeftRadius",
-                          min: 0,
-                          max: 50,
-                          step: 1,
-                          defaultValue: 20,
-                          show: function(e) {
-                              return e.BtnBottomLeftRadius;
-                          },
-                      },
-                  },
-              },
-              AdditionalColorSettings: {
-                  type: "items",
-                  label: "Color Settings",
-                  items: {
-                    aboutcolorSettings: {
-                      component: "text",
-                      label: `Color Settings for Listbox, Dropdown and Button Group:`
-                  },
-                      PossibleBgColor: {
-                          label: "Possible Bg Color",
-                          ref: "PossibleBgColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#fff",
-                          },
-                          show: function(e) {
-                              return e.PossibleBgColorPicker;
-                          },
-                      },
-                      PossibleFontColor: {
-                          label: "Possible Font Color",
-                          ref: "PossibleFontColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#595959",
-                          },
-                          show: function(e) {
-                              return e.PossibleFontColorPicker;
-                          },
-                      },
-                      SelectedBgColor: {
-                          label: "Selected Bg Color",
-                          ref: "SelectedBgColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#009845",
-                          },
-                          show: function(e) {
-                              return e.SelectedBgColorPicker;
-                          },
-                      },
-                      SelectedFontColor: {
-                          label: "Selected Font Color",
-                          ref: "SelectedFontColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#fff",
-                          },
-                          show: function(e) {
-                              return e.SelectedFontColorPicker;
-                          },
-                      },
-                      AlternateBgColor: {
-                          label: "Alternate Bg Color",
-                          ref: "AlternateBgColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#ddd",
-                          },
-                          show: function(e) {
-                              return e.AlternateBgColorPicker;
-                          },
-                      },
-                      AlternateFontColor: {
-                          label: "Alternate Font Color",
-                          ref: "AlternateFontColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#595959",
-                          },
-                          show: function(e) {
-                              return e.AlternateFontColorPicker;
-                          },
-                      },
-                      ExcludedBgColor: {
-                          label: "Excluded Bg Color",
-                          ref: "ExcludedBgColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#a9a9a9",
-                          },
-                          show: function(e) {
-                              return e.ExcludedBgColorPicker;
-                          },
-                      },
-                      ExcludedFontColor: {
-                          label: "Excluded Font Color",
-                          ref: "ExcludedFontColorPicker",
-                          component: "color-picker",
-                          type: "object",
-                          defaultValue: {
-                              color: "#fff",
-                          },
-                          show: function(e) {
-                              return e.ExcludedFontColorPicker;
-                          },
-                      },
-                  },
-              },
+        },
+        SingleDateSwitch: {
+          type: "boolean",
+          component: "switch",
+          label: "Single Date / Interval",
+          ref: "props.isSingleDate",
+          options: [
+            { value: !0, label: "Single Date" },
+            { value: !1, label: "Date Interval" },
+          ],
+          defaultValue: !1,
+        },
+        CustomLabelSwitch: {
+          type: "boolean",
+          component: "switch",
+          label: "Custom Label",
+          ref: "props.customLabelSwitch",
+          options: [
+            { value: !0, translation: "properties.on" },
+            { value: !1, translation: "properties.off" },
+          ],
+          defaultValue: !1,
+        },
+        CustomLabel: {
+          ref: "props.customLabel",
+          label: "Enter to change Label",
+          type: "string",
+          expression: "optional",
+          show: function (data) {
+            return data.props.customLabelSwitch;
           },
-      },
-      InteractivitySettings: {
-          type: "items",
-          label: "Interactivity Settings",
-          items: {
-              EnableSelections: {
-                  type: "boolean",
-                  component: "switch",
-                  label: "Selections",
-                  ref: "enableSelections",
-                  options: [{
-                          value: true,
-                          label: "Enable",
-                      },
-                      {
-                          value: false,
-                          label: "Disable",
-                      },
-                  ],
-                  defaultValue: true,
-              },
-              SelectionUIType: {
-                  type: "string",
-                  component: "dropdown",
-                  label: "Selection Type",
-                  ref: "SelectionUIType",
-                  options: [{
-                          value: "vlist",
-                          label: "Standard list",
-                      },
-                      {
-                          value: "luicheckbox",
-                          label: "Add Checkboxes",
-                      },
-                      {
-                          value: "luiradio",
-                          label: "Add Radio buttons",
-                      },
-                  ],
-                  defaultValue: "vlist",
-                  show: function(d) {
-                      //return d.SelectionUIType == "vlist";
-                      return d.enableSelections;
-                  },
-              },
-              MultiSelect: {
-                  type: "string",
-                  component: "radiobuttons",
-                  label: "Selection Mode",
-                  ref: "multiSelect",
-                  options: [{
-                          value: true,
-                          label: "Multi Select",
-                      },
-                      {
-                          value: false,
-                          label: "Single Select",
-                      },
-                  ],
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections;
-                  },
-              },
-              defaultSelection: {
-                  type: "string",
-                  ref: "defaultSelection",
-                  label: "Default Value",
-                  expression: "optional",
-                  show: function(d) {
-                      return d.enableSelections && !d.multiSelect;
-                  },
-              },
-              SelectMultipleYN: {
-                  ref: "selectMultipleYN",
-                  type: "boolean",
-                  label: "Select Multiple Default Values?",
-                  defaultValue: false,
-                  show: function(d) {
-                      return d.enableSelections && d.multiSelect;
-                  },
-              },
-              selectAlsoDefaults: {
-                  type: "string",
-                  label: "Select also these as default, separate by ,",
-                  ref: "selectAlsoThese",
-                  defaultValue: "",
-                  show: function(d) {
-                      return d.enableSelections && d.multiSelect && d.selectMultipleYN;
-                  },
-                  expression: "optional",
-              },
-              EnableSelectionsMenu: {
-                  type: "boolean",
-                  component: "switch",
-                  label: "Selections Menu Bar",
-                  ref: "enableSelectionsMenu",
-                  options: [{
-                          value: true,
-                          label: "Enable",
-                      },
-                      {
-                          value: false,
-                          label: "Disable",
-                      },
-                  ],
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections;
-                  },
-              },
-              SelectionsMenuItemListSelectAll: {
-                  type: "boolean",
-                  label: "Select All",
-                  ref: "enableSelectAll",
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections && d.enableSelectionsMenu;
-                  },
-              },
-              SelectionsMenuItemListSelectExcluded: {
-                  type: "boolean",
-                  label: "Select Excluded",
-                  ref: "enableSelectExcluded",
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections && d.enableSelectionsMenu;
-                  },
-              },
-              SelectionsMenuItemListSelectPossible: {
-                  type: "boolean",
-                  label: "Select Possible",
-                  ref: "enableSelectPossible",
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections && d.enableSelectionsMenu;
-                  },
-              },
-              SelectionsMenuItemListSelectAlternative: {
-                  type: "boolean",
-                  label: "Select Alternative",
-                  ref: "enableSelectAlternative",
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections && d.enableSelectionsMenu;
-                  },
-              },
-              SelectionsMenuItemListClearAll: {
-                  type: "boolean",
-                  label: "Clear All",
-                  ref: "enableClearAll",
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections && d.enableSelectionsMenu;
-                  },
-              },
-              SelectionsMenuItemListLockField: {
-                  type: "boolean",
-                  label: "Lock Field",
-                  ref: "enableLockField",
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections && d.enableSelectionsMenu;
-                  },
-              },
-              SelectionsMenuItemListUnLockField: {
-                  type: "boolean",
-                  label: "Unlock Field",
-                  ref: "enableUnlockField",
-                  defaultValue: true,
-                  show: function(d) {
-                      return d.enableSelections && d.enableSelectionsMenu;
-                  },
-              },
+        },
+        viewModeSwitch: {
+          type: "boolean",
+          component: "switch",
+          label: "Day / Month",
+          ref: "props.isDay",
+          options: [
+            { value: !0, label: "Month" },
+            { value: !1, label: "Day" },
+          ],
+          defaultValue: !1,
+        },
+        dayFormatType: {
+          ref: "props.dayFormat",
+          label: "Format Type Select",
+          component: "dropdown",
+          type: "string",
+          options: viewModes.day.dayFormat,
+          defaultValue: viewModes.day.dayFormat[0][0],
+          show: function (e) {
+            return !e.props.isDay && e.props.dayFormat;
           },
-      },
-      dataHandling: {
-          uses: 'dataHandling'
-      },
-      about: {
-        label: "About",
-        component: "items",
-        items: {
-          header: { label: "Advanced Filter", style: "header", component: "text" },
-          paragraph1: {
-            label:
-              "A filter object that allows a user to make selections in a field.",
-            component: "text",
-          }
+        },
+        dayFormatHeaderType: {
+          ref: "props.dayheaderFormat",
+          label: "Header Format Type Select",
+          component: "dropdown",
+          type: "string",
+          options: daysOfWeek.day.dayFormat,
+          defaultValue: daysOfWeek.day.dayFormat[0][2],
+          show: function (e) {
+            return !e.props.isDay && e.props.dayheaderFormat;
+          },
+        },
+        monthFormatType: {
+          ref: "props.monthFormat",
+          label: "Format Type Select",
+          component: "dropdown",
+          type: "string",
+          options: viewModes.month.monthYearFormat,
+          defaultValue: viewModes.month.monthYearFormat[0][0],
+          show: function (e) {
+            return e.props.isDay && e.props.monthFormat;
+          },
+        },
+        linkedCalendarsSwitch: {
+          type: "boolean",
+          component: "switch",
+          label: "Link Calendars?",
+          ref: "props.linkedCalendars",
+          options: [
+            { value: false, label: "Unlink" },
+            { value: true, label: "Link" },
+          ],
+          defaultValue: false,
+        },
+        Separator: {
+          type: "string",
+          ref: "props.separator",
+          label: "Separator",
+          defaultValue: "-",
+          expression: "optional",
+        },
+        defaultSelectionSwitch: {
+          type: "boolean",
+          component: "switch",
+          label: "Default Selections",
+          ref: "defaultselectionsEnabled",
+          options: [
+            { value: !0, translation: "properties.on" },
+            { value: !1, translation: "properties.off" },
+          ],
+          defaultValue: !1,
+          show: function (data) {
+            return (
+              data.qListObjectDef.qDef.qFieldDefs.length > 0 &&
+              data.qListObjectDef.qDef.qFieldDefs[0].length > 0
+            );
+          },
+        },
+        defaultText: {
+          ref: "props.defaultText",
+          defaultValue: labelName,
+        },
+        defaultSelection: {
+          type: "string",
+          ref: "defaultSelection",
+          label: "Default Value",
+          expression: "optional",
+          show: function(d) {
+            return  d.defaultselectionsEnabled;
         },
       },
+      SelectMultipleYN: {
+        ref: "selectMultipleYN",
+        type: "boolean",
+        label: "Select Multiple Default Values?",
+        defaultValue: false,
+        show: function (data) {
+          return data.defaultselectionsEnabled;
+        },
+        show: function(d) {
+          return  d.defaultselectionsEnabled;
+      },
+       
+    },
+      selectAlsoDefaults: {
+        type: "string",
+        label: "Select also these as default, separate by ,",
+        ref: "selectAlsoThese",
+        defaultValue: "",
+        expression: "optional",
+        show: function(d) {
+          return  d.defaultselectionsEnabled && d.selectMultipleYN;
+      },
+    },
+    SelectRangeYN: {
+      ref: "selectRangeYN",
+      type: "boolean",
+      label: "Default Selection Range?",
+      defaultValue: false,
+      show: function(d) {
+        return  d.defaultselectionsEnabled;
+    },
+     
+  },
+    defaultSelectionsminDate: {
+      ref: "props.defaultselectionminDate",
+      label: "Default Selection Min Date",
+      type: "string",
+      expression: "optional",
+      show: function (data) {
+        return data.defaultselectionsEnabled && data.selectRangeYN ;
+      },
+    },
+    defaultSelectionsmaxDate: {
+      ref: "props.defualtselectionmaxDate",
+      label: "Default Selection Max Date",
+      type: "string",
+      expression: "optional",
+      show: function (data) {
+        return data.defaultselectionsEnabled && data.selectRangeYN;
+      },
+    },
+        advanced: {
+          type: "boolean",
+          component: "switch",
+          label: "Advanced setup",
+          ref: "advanced",
+          options: [
+            { value: !0, translation: "properties.on" },
+            { value: !1, translation: "properties.off" },
+          ],
+          defaultValue: !1,
+          show: function (data) {
+            return (
+              data.qListObjectDef.qDef.qFieldDefs.length > 0 &&
+              data.qListObjectDef.qDef.qFieldDefs[0].length > 0
+            );
+          },
+        },
+        minDate: {
+          ref: "props.minDate",
+          label: "Min Date",
+          type: "string",
+          expression: "optional",
+          show: function (data) {
+            return data.advanced;
+          },
+        },
+        maxDate: {
+          ref: "props.maxDate",
+          label: "Max Date",
+          type: "string",
+          expression: "optional",
+          show: function (data) {
+            return data.advanced;
+          },
+        },
+        startDate: {
+          ref: "props.startDate",
+          label: "Start Date",
+          type: "string",
+          expression: "optional",
+          show: function (data) {
+            return data.advanced;
+          },
+        },
+        endDate: {
+          ref: "props.endDate",
+          label: "End Date",
+          type: "string",
+          expression: "optional",
+          show: function (data) {
+            return data.advanced;
+          },
+        },
+      },
+    },
+    appearance: {
+      uses: "settings",
+      items: {
+        dropdownStyling: {
+          type: "items",
+          label: "Dropdown Styling",
+          items: {
+            aboutdropdownSettings: {
+              component: "text",
+              label: `Dropdown styling for Calendar:`,
+            },
+            dropdownWidth: {
+              type: "number",
+              component: "slider",
+              label: "Width (px)",
+              ref: "props.dropdownWidth",
+              min: 30,
+              max: 100,
+              step: 10,
+              defaultValue: 100,
+              show: function (e) {
+                return e.props.dropdownWidth;
+              },
+            },
+            dropdownfontSize: {
+              type: "number",
+              component: "slider",
+              label: "Font Size (px)",
+              ref: "props.dropdownfontSize",
+              min: 0,
+              max: 20,
+              step: 1,
+              defaultValue: 14,
+              show: function (e) {
+                return e.props.dropdownfontSize;
+              },
+            },
+            dropdownfontColor: {
+              label: "Font Color",
+              ref: "props.dropdownfontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#595959",
+              },
+              show: function (e) {
+                return e.props.dropdownfontColor;
+              },
+            },
+            dropdownBgColor: {
+              label: "Background Color",
+              ref: "props.dropdownBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+              show: function (e) {
+                return e.props.dropdownBgColor;
+              },
+            },
+            dropdownborderType: {
+              ref: "props.dropdownborderType",
+              label: "Border Type Select",
+              component: "dropdown",
+              type: "string",
+              options: [
+                {
+                  label: "Solid",
+                  value: "solid",
+                },
+                {
+                  label: "Dotted",
+                  value: "dotted",
+                },
+                {
+                  label: "Dashed",
+                  value: "dashed",
+                },
+                {
+                  label: "Double",
+                  value: "double",
+                },
+                {
+                  label: "None",
+                  value: "none",
+                },
+              ],
+              defaultValue: "solid",
+            },
+            dropdownborderWidth: {
+              type: "number",
+              component: "slider",
+              label: "Border Width (px)",
+              ref: "props.dropdownborderWidth",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+            dropdownborderColor: {
+              label: "Border Color",
+              ref: "props.dropdownborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#ddd",
+              },
+            },
+            dropdownborderRadius: {
+              type: "number",
+              component: "slider",
+              label: "Border Radius (px)",
+              ref: "props.dropdownborderRadius",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+              show: function (e) {
+                return e.props.dropdownBorder;
+              },
+            },
+          },
+        },
+        headerStyling: {
+          type: "items",
+          label: "Header Styling",
+          items: {
+            aboutheaderSettings: {
+              component: "text",
+              label: `Header styling for Calendar:`,
+            },
+            headerWidth: {
+              type: "number",
+              component: "slider",
+              label: "Width (px)",
+              ref: "props.headerWidth",
+              min: 0,
+              max: 80,
+              step: 1,
+              defaultValue: 54,
+              show: function (e) {
+                return e.props.headerWidth;
+              },
+            },
+            headerHeight: {
+              type: "number",
+              component: "slider",
+              label: "Height (px)",
+              ref: "props.headerHeight",
+              min: 0,
+              max: 80,
+              step: 1,
+              defaultValue:40,
+              show: function (e) {
+                return e.props.headerHeight;
+              },
+            },
+            headerfontSize: {
+              type: "number",
+              component: "slider",
+              label: "Font Size (px)",
+              ref: "props.headerfontSize",
+              min: 0,
+              max: 18,
+              step: 1,
+              defaultValue: 12,
+              show: function (e) {
+                return e.props.headerfontSize;
+              },
+            },
+            headerfontColor: {
+              label: "Font Color",
+              ref: "props.headerfontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#4b4b4b",
+              },
+              show: function (e) {
+                return e.props.headerfontColor;
+              },
+            },
+            headerFontStyle: {
+              ref: "props.headerfontStyle",
+              translation: "Font Style",
+              type: "string",
+              component: "dropdown",
+              options: [
+                {
+                  value: "normal",
+                  label: "Normal",
+                },
+                {
+                  value: "bold",
+                  label: "Bold",
+                },
+                {
+                  value: "italic",
+                  label: "Italic",
+                },
+                {
+                  value: "underline",
+                  label: "Underline",
+                },
+              ],
+              defaultValue: "italic",
+            },
+            headerBgColor: {
+              label: "Background Color",
+              ref: "props.headerBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#f2f2f2",
+              },
+              show: function (e) {
+                return e.props.headerBgColor;
+              },
+            },
+            headerborderType: {
+              ref: "props.headerborderType",
+              label: "Border Type Select",
+              component: "dropdown",
+              type: "string",
+              options: [
+                {
+                  label: "Solid",
+                  value: "solid",
+                },
+                {
+                  label: "Dotted",
+                  value: "dotted",
+                },
+                {
+                  label: "Dashed",
+                  value: "dashed",
+                },
+                {
+                  label: "Double",
+                  value: "double",
+                },
+                {
+                  label: "None",
+                  value: "none",
+                },
+              ],
+              defaultValue: "solid",
+            },
+            headerborderWidth: {
+              type: "number",
+              component: "slider",
+              label: "Border Width (px)",
+              ref: "props.headerborderWidth",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+             headerborderColor: {
+              label: "Border Color",
+              ref: "props.headerborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+            },
+            headerborderRadius: {
+              type: "number",
+              component: "slider",
+              label: "Border Radius (px)",
+              ref: "props.headerborderRadius",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+          },
+        },
+        cellStyling: {
+          type: "items",
+          label: "Cell Styling",
+          items: {
+            aboutcellSettings: {
+              component: "text",
+              label: `Cell level styling for Calendar:`,
+            },
+            cellHeight: {
+              type: "number",
+              component: "slider",
+              label: "Font Size (px)",
+              ref: "props.cellHeight",
+              min: 0,
+              max: 100,
+              step: 1,
+              defaultValue: 45,
+              show: function (e) {
+                return e.props.cellHeight;
+              },
+            },
+            cellfontSize: {
+              type: "number",
+              component: "slider",
+              label: "Font Size (px)",
+              ref: "props.cellfontSize",
+              min: 0,
+              max: 18,
+              step: 1,
+              defaultValue: 12,
+              show: function (e) {
+                return e.props.cellfontSize;
+              },
+            },
+            cellborderType: {
+              ref: "props.cellborderType",
+              label: "Border Type Select",
+              component: "dropdown",
+              type: "string",
+              options: [
+                {
+                  label: "Solid",
+                  value: "solid",
+                },
+                {
+                  label: "Dotted",
+                  value: "dotted",
+                },
+                {
+                  label: "Dashed",
+                  value: "dashed",
+                },
+                {
+                  label: "Double",
+                  value: "double",
+                },
+                {
+                  label: "None",
+                  value: "none",
+                },
+              ],
+              defaultValue: "solid",
+            },
+            cellborderWidth: {
+              type: "number",
+              component: "slider",
+              label: "Border Width (px)",
+              ref: "props.cellborderWidth",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+            cellborderColor: {
+              label: "Border Color",
+              ref: "props.cellborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+            },
+            cellborderRadius: {
+              type: "number",
+              component: "slider",
+              label: "Border Radius (px)",
+              ref: "props.cellborderRadius",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+          },
+        },
+        additionalcolorStyling: {
+          type: "items",
+          label: "Cell Color Styling",
+          items: {
+            aboutcolorSettings: {
+              component: "text",
+              label: `Color styling for different states:`,
+            },
+            possibleBgColor: {
+              label: "Possible Bg Color",
+              ref: "props.possibleBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#DDDDDD",
+              },
+              show: function (e) {
+                return e.props.possibleBgColor;
+              },
+            },
+            possiblefontColor: {
+              label: "Possible Font Color",
+              ref: "props.possiblefontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#333333",
+              },
+              show: function (e) {
+                return e.props.possiblefontColor;
+              },
+            },
+            selectedBgColor: {
+              label: "Selected Bg Color",
+              ref: "props.selectedBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#4D9648",
+              },
+              show: function (e) {
+                return e.props.selectedBgColor;
+              },
+            },
+            selectedfontColor: {
+              label: "Selected Font Color",
+              ref: "props.selectedfontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+              show: function (e) {
+                return e.props.selectedfontColor;
+              },
+            },
+            alternateBgColor: {
+              label: "Alternate Bg Color",
+              ref: "props.alternateBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#ddd",
+              },
+              show: function (e) {
+                return e.props.alternateBgColor;
+              },
+            },
+            alternatefontColor: {
+              label: "Alternate Font Color",
+              ref: "props.alternatefontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#595959",
+              },
+              show: function (e) {
+                return e.props.alternatefontColor;
+              },
+            },
+            excludedBgColor: {
+              label: "Excluded Bg Color",
+              ref: "props.excludedBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#a9a9a9",
+              },
+              show: function (e) {
+                return e.props.excludedBgColor;
+              },
+            },
+            excludedFontColor: {
+              label: "Excluded Font Color",
+              ref: "props.excludedFontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+              show: function (e) {
+                return e.props.excludedFontColor;
+              },
+            },
+          },
+        },
+        CalendarStyling: {
+          type: "items",
+          label: "Calendar Styling",
+          items: {
+            aboutcellSettings: {
+              component: "text",
+              label: `Styling for Calendar:`,
+            },
+            BgColor: {
+              label: "Background Color",
+              ref: "props.CalendarBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+              show: function (e) {
+                return e.props.CalendarBgColor;
+              },
+            },
+            calendarborderType: {
+              ref: "props.calendarborderType",
+              label: "Border Type Select",
+              component: "dropdown",
+              type: "string",
+              options: [
+                {
+                  label: "Solid",
+                  value: "solid",
+                },
+                {
+                  label: "Dotted",
+                  value: "dotted",
+                },
+                {
+                  label: "Dashed",
+                  value: "dashed",
+                },
+                {
+                  label: "Double",
+                  value: "double",
+                },
+                {
+                  label: "None",
+                  value: "none",
+                },
+              ],
+              defaultValue: "solid",
+            },
+            calendarborderWidth: {
+              type: "number",
+              component: "slider",
+              label: "Border Width (px)",
+              ref: "props.calendarborderWidth",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+            calendarborderColor: {
+              label: "Border Color",
+              ref: "props.calendarborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#ddd",
+              },
+            },
+            calendarborderColor: {
+              label: "Border Color",
+              ref: "props.calendarborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#ddd",
+              },
+            },
+          },
+        },
+        rangesStyling: {
+          type: "items",
+          label: "Ranges Styling",
+          items: {
+            aboutrangesSettings: {
+              component: "text",
+              label: `Ranges styling for Calendar:`,
+            },
+
+            rangesfontSize: {
+              type: "number",
+              component: "slider",
+              label: "Font Size (px)",
+              ref: "props.rangesfontSize",
+              min: 0,
+              max: 20,
+              step: 1,
+              defaultValue: 13,
+              show: function (e) {
+                return e.props.rangesfontSize;
+              },
+            },
+            rangesfontWeight: {
+              component: "ranges",
+              label: "Font Weight (px)",
+              ref: "props.fontWeight",
+              type: "string",
+              options: [
+                {
+                  label: "100",
+                  value: "100",
+                },
+                {
+                  label: "200",
+                  value: "200",
+                },
+                {
+                  label: "300",
+                  value: "300",
+                },
+                {
+                  label: "400",
+                  value: "400",
+                },
+                {
+                  label: "500",
+                  value: "500",
+                },
+                {
+                  label: "600",
+                  value: "600",
+                },
+                {
+                  label: "700",
+                  value: "700",
+                },
+                {
+                  label: "Bold",
+                  value: "bold",
+                },
+                {
+                  label: "Bolder",
+                  value: "bolder",
+                },
+                {
+                  label: "Lighter",
+                  value: "lighter",
+                },
+                {
+                  label: "Normal",
+                  value: "normal",
+                },
+              ],
+              defaultValue: "700",
+              show: function (e) {
+                return e.props.fontWeight;
+              },
+            },
+            rangesfontColor: {
+              label: "Font Color",
+              ref: "props.rangesfontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#595959",
+              },
+              show: function (e) {
+                return e.props.rangesfontColor;
+              },
+            },
+            rangesBgColor: {
+              label: "Background Color",
+              ref: "props.rangesBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+              show: function (e) {
+                return e.props.rangesBgColor;
+              },
+            },
+            rangesborderType: {
+              ref: "props.rangesborderType",
+              label: "Border Type Select",
+              component: "dropdown",
+              type: "string",
+              options: [
+                {
+                  label: "Solid",
+                  value: "solid",
+                },
+                {
+                  label: "Dotted",
+                  value: "dotted",
+                },
+                {
+                  label: "Dashed",
+                  value: "dashed",
+                },
+                {
+                  label: "Double",
+                  value: "double",
+                },
+                {
+                  label: "None",
+                  value: "none",
+                },
+              ],
+              defaultValue: "none",
+            },
+            rangesborderWidth: {
+              type: "number",
+              component: "slider",
+              label: "Border Width (px)",
+              ref: "props.rangesborderWidth",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+            rangesborderColor: {
+              label: "Border Color",
+              ref: "props.rangesborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#ddd",
+              },
+            },
+            rangesborderRadius: {
+              type: "number",
+              component: "slider",
+              label: "Border Radius (px)",
+              ref: "props.rangesborderRadius",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+            },
+          },
+        },
+        footerStyling: {
+          type: "items",
+          label: "Footer Styling",
+          items: {
+            aboutrangesSettings: {
+              component: "text",
+              label: `Footer styling for Calendar:`,
+            },
+
+            footerfontSize: {
+              type: "number",
+              component: "slider",
+              label: "Font Size (px)",
+              ref: "props.footerfontSize",
+              min: 0,
+              max: 20,
+              step: 1,
+              defaultValue: 13,
+              show: function (e) {
+                return e.props.footerfontSize;
+              },
+            },
+            footerfontColor: {
+              label: "Font Color",
+              ref: "props.footerfontColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#595959",
+              },
+              show: function (e) {
+                return e.props.footerfontColor;
+              },
+            },
+            footerBgColor: {
+              label: "Background Color",
+              ref: "props.footerBgColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#fff",
+              },
+              show: function (e) {
+                return e.props.footerBgColor;
+              },
+            },
+            footerBorder: {
+              type: "boolean",
+              component: "switch",
+              label: "Border",
+              ref: "props.footerBorder",
+              options: [
+                {
+                  value: true,
+                  label: "Enabled",
+                },
+                {
+                  value: false,
+                  label: "Disabled",
+                },
+              ],
+              defaultValue: true,
+            },
+            footerborderType: {
+              ref: "props.footerborderType",
+              label: "Border Type Select",
+              component: "dropdown",
+              type: "string",
+              options: [
+                {
+                  label: "Solid",
+                  value: "solid",
+                },
+                {
+                  label: "Dotted",
+                  value: "dotted",
+                },
+                {
+                  label: "Dashed",
+                  value: "dashed",
+                },
+                {
+                  label: "Double",
+                  value: "double",
+                },
+                {
+                  label: "None",
+                  value: "none",
+                },
+              ],
+              defaultValue: "solid",
+              show: function (e) {
+                return e.props.footerBorder;
+              },
+            },
+            footerborderWidth: {
+              type: "number",
+              component: "slider",
+              label: "Border Width (px)",
+              ref: "props.footerborderWidth",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+              show: function (e) {
+                return e.props.footerBorder;
+              },
+            },
+            footerborderColor: {
+              label: "Border Color",
+              ref: "props.footerborderColor",
+              component: "color-picker",
+              type: "object",
+              defaultValue: {
+                color: "#ddd",
+              },
+              show: function (e) {
+                return e.props.footerBorder;
+              },
+            },
+            footerborderRadius: {
+              type: "number",
+              component: "slider",
+              label: "Border Radius (px)",
+              ref: "props.footerborderRadius",
+              min: 0,
+              max: 5,
+              step: 1,
+              defaultValue: 1,
+              show: function (e) {
+                return e.props.footerBorder;
+              },
+            },
+          },
+        },
+      },
+    },
+    CalSettings: {
+      component: "expandable-items",
+      label: "Calendar Settings",
+      items: {
+        ranges: {
+          type: "items",
+          label: "Predefined ranges",
+
+          items: {
+            showPredefinedRanges: {
+              type: "items",
+              items: {
+                CustomRangesSwitch: {
+                  type: "boolean",
+                  component: "switch",
+                  label: "Show predefined ranges",
+                  ref: "props.CustomRangesEnabled",
+                  options: [
+                    { value: !0, translation: "properties.on" },
+                    { value: !1, translation: "properties.off" },
+                  ],
+                  defaultValue: !0,
+                },
+                CustomRange: {
+                  type: "items",
+                  label: "Custom Range New",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "Custom Range New",
+                      ref: "props.enablecustomRange",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: false,
+                    },
+                    minDate: {
+                      ref: "props.customminDate",
+                      label: "Custom Min Date",
+                      type: "string",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enablecustomRange;
+                      },
+                    },
+                    maxDate: {
+                      ref: "props.custommaxDate",
+                      label: "Custom Max Date",
+                      type: "string",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enablecustomRange;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+               
+                Today: {
+                  type: "items",
+                  label: "Today",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "Today",
+                      ref: "props.enableToday",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: false,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.today",
+                      label: "Label",
+                      defaultValue: "Today",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableToday;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                Yesterday: {
+                  type: "items",
+                  label: "Yesterday",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "Yesterday",
+                      ref: "props.enableYesterday",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: false,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.yesterday",
+                      label: "Label",
+                      defaultValue: "Yesterday",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableYesterday;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                LastXDays: {
+                  type: "items",
+                  label: "Last X Days",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "LastXDays",
+                      ref: "props.enableLastXDays",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.lastXDays",
+                      label: "Label",
+                      defaultValue: lastXDays,
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableLastXDays;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                ThisMonth: {
+                  type: "items",
+                  label: "This Month",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "ThisMonth",
+                      ref: "props.enableThisMonth",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.thisMonth",
+                      label: "Label",
+                      defaultValue: "This Month",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableThisMonth;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                LastMonth: {
+                  type: "items",
+                  label: "Last Month",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "LastMonth",
+                      ref: "props.enableLastMonth",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.lastMonth",
+                      label: "Label",
+                      defaultValue: "Last Month",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableLastMonth;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                CurrentQuarter: {
+                  type: "items",
+                  label: "Current Quarter",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "CurrentQuarter",
+                      ref: "props.enableCurrentQuarter",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.currentQuarter",
+                      label: "Label",
+                      defaultValue: "Current Quarter",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableCurrentQuarter;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                LastQuarter: {
+                  type: "items",
+                  label: "Last Quarter",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "LastQuarter",
+                      ref: "props.enableLastQuarter",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.lastQuarter",
+                      label: "Label",
+                      defaultValue: "Last Quarter",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableLastQuarter;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                CurrentYear: {
+                  type: "items",
+                  label: "Current Year",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "CurrentYear",
+                      ref: "props.enableCurrentYear",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.currentYear",
+                      label: "Label",
+                      defaultValue: "Current Year",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableCurrentYear;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                LastYear: {
+                  type: "items",
+                  label: "Last Year",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "LastYear",
+                      ref: "props.enableLastYear",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.lastYear",
+                      label: "Label",
+                      defaultValue: "Last Year",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableLastYear;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                QuarterToDate: {
+                  type: "items",
+                  label: "Quarter To Date",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "QuarterToDate",
+                      ref: "props.enableQuarterToDate",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: false,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.quarterToDate",
+                      label: "Label",
+                      defaultValue: "Quarter To Date",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableQuarterToDate;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                YearToDate: {
+                  type: "items",
+                  label: "Year To Date",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "YearToDate",
+                      ref: "props.enableYearToDate",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.yearToDate",
+                      label: "Label",
+                      defaultValue: "Year To Date",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableYearToDate;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                Rolling12Months: {
+                  type: "items",
+                  label: "Rolling 12 Months",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "Rolling12Months",
+                      ref: "props.enableRolling12Months",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: true,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.rolling12Months",
+                      label: "Label",
+                      defaultValue: "Rolling 12 Months",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableRolling12Months;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+                Rolling12MonthsFull: {
+                  type: "items",
+                  label: "Rolling 12 Months Full",
+                  items: {
+                    EnableRange: {
+                      type: "boolean",
+                      component: "switch",
+                      label: "Rolling12MonthsFull",
+                      ref: "props.enableRolling12MonthsFull",
+                      options: [
+                        {
+                          value: true,
+                          translation: "properties.on",
+                        },
+                        {
+                          value: false,
+                          translation: "properties.off",
+                        },
+                      ],
+                      defaultValue: false,
+                    },
+                    Text: {
+                      type: "string",
+                      ref: "props.rolling12MonthsFull",
+                      label: "Label",
+                      defaultValue: "Rolling 12 Months Full",
+                      expression: "optional",
+                      show: function (data) {
+                        return data.props.enableRolling12MonthsFull;
+                      },
+                    },
+                  },
+                  show: function (data) {
+                    return data.props.CustomRangesEnabled;
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    about: {
+      label: "About",
+      component: "items",
+      items: {
+        header: { label: "Date picker", style: "header", component: "text" },
+        paragraph1: {
+          label:
+            "A calendar object that allows a user to make selections in a date field.",
+          component: "text",
+        },
+      },
+    },
   },
 };

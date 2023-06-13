@@ -86,7 +86,7 @@
         applyLabel: "Apply",
         cancelLabel: "Cancel",
         weekLabel: "W",
-        customRangeLabel: "Custom Range",
+        customRangeLabel: "",
         daysOfWeek: this.daysofWeekNew,
         monthNames: moment.monthsShort(),
         firstDay: moment.localeData().firstDayOfWeek(),
@@ -110,48 +110,48 @@
       )
         options.template =
           '<div id= "dropDown_' +
-          encoder.encodeForHTML(options.id) +
-          '" class="daterangepicker">' +
-          "<div>" +
-          "<table>" +
-          "<tr>" +
-          "<td>" +
-          '<div class="ranges"></div>' +
-          "</td>" +
-          "<td>" +
-          '<div class="drp-calendar left">' +
-          '<div class="calendar-table"></div>' +
-          '<div class="calendar-time"></div>' +
-          "</div>" +
-          "</td>" +
-          " <td>" +
-          '<div class="drp-calendar right">' +
-          '<div class="calendar-table"></div>' +
-          '<div class="calendar-time"></div>' +
-          "</div>" +
-          "</td>" +
-          "</tr>" +
-          "<tr>" +
-          " </tr>" +
-          " </table>" +
-          '<div class="drp-buttons">' +
-          '<span style="float: left;padding: 10px;font-weight: bold;">SELECTIONS</span>' +
-          '<span class="drp-selected-from"></span>' +
-          "<span>" +
-          " " +
-          "</span>" +
-          '<span class="separatorfromto">' +
-          "-" +
-          "</span>" +
-          "<span>" +
-          " " +
-          "</span>" +
-          '<span class="drp-selected-to"></span>' +
-          '<button class="cancelBtn" type="button"></button>' +
-          '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
-          "</div>" +
-          "</div>" +
-          "</div>";
+          encoder.encodeForHTML(options.id) + '" class="daterangepicker">' +
+          `<div>
+          <table>
+          <tbody>
+          <div class="dropdownNew" style="float:left;">
+          <button class="dropbtn">Quick Select</button>
+          <div class="dropdown-content" style="left:0;">
+          <div class="ranges"></div>
+          </div>
+          </div>
+          <tr>
+          <td>
+          <div class="drp-calendar left">
+          <div class="calendar-table"></div>
+          <div class="calendar-time"></div>
+          </div>
+          </td>
+          <td>
+          <div class="drp-calendar right">
+          <div class="calendar-table"></div>
+          <div class="calendar-time"></div>
+          </div>
+          </td>
+          </tr>
+          <tr>
+          </tr>
+          </tbody>
+          <div class="drp-buttons">
+          <span style="float: left;padding: 10px;font-weight: bold;">SELECTIONS</span>
+          <span class="drp-selected-from"></span>
+          <span>   </span>
+          <span class="separatorfromto">-</span>
+          <span>   </span>
+          <span class="drp-selected-to"></span>
+          <button class="cancelBtn" type="button"></button>
+          <button class="applyBtn" disabled="disabled" type="button"></button>
+          </div>
+          </div>
+          </div>
+          </table>
+         
+          `;
 
       this.parentEl =
         options.parentEl && $(options.parentEl).length
@@ -1183,7 +1183,7 @@
             // disable weekends : logic is good but have to see how to use this a switch on UI side and update the count of days on tooltip
             // if (this.isDisableWeekend(calendar[row][col]))
             // classes.push("off", "disabled");
-              
+
             // apply custom classes for this date
             var isCustom = this.isCustomDate(calendar[row][col]);
             if (isCustom !== false) {
@@ -1690,7 +1690,6 @@
           var dates = this.ranges[label];
           this.startDate = dates[0];
           this.endDate = dates[1];
-
           if (!this.timePicker) {
             this.startDate.startOf("day");
             this.endDate.endOf("day");
@@ -1933,17 +1932,6 @@
             }
           }
           i++;
-        }
-        if (customRange) {
-          if (this.showCustomRangeLabel) {
-            this.chosenLabel = this.container
-              .find(".ranges li:last")
-              .addClass("active")
-              .attr("data-range-key");
-          } else {
-            this.chosenLabel = null;
-          }
-          this.showCalendars();
         }
       },
 
