@@ -127,7 +127,7 @@ var viewModes = {
       },
     ],
     defaultFormat: "YYYY/MMM",
-    cellFormat:  "MMM"  
+    cellFormat: "MMM",
   },
 };
 var daysOfWeek = {
@@ -195,19 +195,18 @@ export default {
               (data.props.endDate = {
                 qStringExpression: "=Max([" + field + "])",
               });
-              (data.props.customminDate = {
-                qStringExpression: "",
-              }),
+            (data.props.customminDate = {
+              qStringExpression: "",
+            }),
               (data.props.custommaxDate = {
                 qStringExpression: "",
               });
-              (data.props.defaultselectionminDate = {
-                qStringExpression: "",
-              });
-              (data.props.defaultselectionmaxDate = {
-                qStringExpression: "",
-              });
-              
+            data.props.defaultselectionminDate = {
+              qStringExpression: "",
+            };
+            data.props.defaultselectionmaxDate = {
+              qStringExpression: "",
+            };
           },
         },
         fieldAdvanced: {
@@ -241,6 +240,10 @@ export default {
             { value: !1, translation: "properties.off" },
           ],
           defaultValue: !1,
+        },
+        defaultText: {
+          ref: "props.defaultText",
+          defaultValue: labelName,
         },
         CustomLabel: {
           ref: "props.customLabel",
@@ -323,77 +326,58 @@ export default {
             { value: !1, translation: "properties.off" },
           ],
           defaultValue: !1,
-          show: function (data) {
-            return (
-              data.qListObjectDef.qDef.qFieldDefs.length > 0 &&
-              data.qListObjectDef.qDef.qFieldDefs[0].length > 0
-            );
-          },
-        },
-        defaultText: {
-          ref: "props.defaultText",
-          defaultValue: labelName,
         },
         defaultSelection: {
           type: "string",
           ref: "defaultSelection",
-          label: "Default Value",
+          label: 'Add example here: "2019-01-01" + "2019-01-31"',
           expression: "optional",
-          show: function(d) {
-            return  d.defaultselectionsEnabled;
+          show: function (d) {
+            return d.defaultselectionsEnabled && !d.selectRangeYN;
+          },
         },
-      },
-      SelectMultipleYN: {
-        ref: "selectMultipleYN",
-        type: "boolean",
-        label: "Select Multiple Default Values?",
-        defaultValue: false,
-        show: function (data) {
-          return data.defaultselectionsEnabled;
+        aboutdefaultSelection: {
+          component: "text",
+          label: `Use similar logic to search in filter for default values entry. For mutiple default values: we enter in this format "value1" + "value2"' . Also attaching the link for help.`,
+          show: function (d) {
+            return d.defaultselectionsEnabled;
+          },
         },
-        show: function(d) {
-          return  d.defaultselectionsEnabled;
-      },
-       
-    },
-      selectAlsoDefaults: {
-        type: "string",
-        label: "Select also these as default, separate by ,",
-        ref: "selectAlsoThese",
-        defaultValue: "",
-        expression: "optional",
-        show: function(d) {
-          return  d.defaultselectionsEnabled && d.selectMultipleYN;
-      },
-    },
-    SelectRangeYN: {
-      ref: "selectRangeYN",
-      type: "boolean",
-      label: "Default Selection Range?",
-      defaultValue: false,
-      show: function(d) {
-        return  d.defaultselectionsEnabled;
-    },
-     
-  },
-    defaultSelectionsminDate: {
-      ref: "props.defaultselectionminDate",
-      label: "Default Selection Min Date",
-      type: "string",
-      expression: "optional",
-      show: function (data) {
-        return data.defaultselectionsEnabled && data.selectRangeYN ;
-      },
-    },
-    defaultSelectionsmaxDate: {
-      ref: "props.defualtselectionmaxDate",
-      label: "Default Selection Max Date",
-      type: "string",
-      expression: "optional",
-      show: function (data) {
-        return data.defaultselectionsEnabled && data.selectRangeYN;
-      },
-    },
+        aboutdefaultSelectionLink: {
+          label: "Link",
+          component: "link",
+          url: "https://help.qlik.com/en-US/sense/February2021/Subsystems/Hub/Content/Sense_Hub/Selections/SelectionsToolbar/search-selections.htm#anchor-1",
+          show: function (d) {
+            return d.defaultselectionsEnabled;
+          },
+        },
+        SelectRangeYN: {
+          ref: "selectRangeYN",
+          type: "boolean",
+          label: "Default Selection Range?",
+          defaultValue: false,
+          show: function (d) {
+            return d.defaultselectionsEnabled;
+          },
+        },
+        defaultSelectionsminDate: {
+          ref: "props.defaultselectionminDate",
+          label: "Default Selection Min Date",
+          type: "string",
+          expression: "optional",
+          show: function (data) {
+            return data.defaultselectionsEnabled && data.selectRangeYN;
+          },
+        },
+        defaultSelectionsmaxDate: {
+          ref: "props.defaultselectionmaxDate",
+          label: "Default Selection Max Date",
+          type: "string",
+          expression: "optional",
+          show: function (data) {
+            return data.defaultselectionsEnabled && data.selectRangeYN;
+          },
+        },
         advanced: {
           type: "boolean",
           component: "switch",
@@ -602,7 +586,7 @@ export default {
               min: 0,
               max: 80,
               step: 1,
-              defaultValue:40,
+              defaultValue: 40,
               show: function (e) {
                 return e.props.headerHeight;
               },
@@ -708,7 +692,7 @@ export default {
               step: 1,
               defaultValue: 1,
             },
-             headerborderColor: {
+            headerborderColor: {
               label: "Border Color",
               ref: "props.headerborderColor",
               component: "color-picker",
@@ -1374,7 +1358,7 @@ export default {
                     return data.props.CustomRangesEnabled;
                   },
                 },
-               
+
                 Today: {
                   type: "items",
                   label: "Today",
@@ -1849,7 +1833,6 @@ export default {
         },
       },
     },
-
     about: {
       label: "About",
       component: "items",
