@@ -156,7 +156,7 @@ export default function ($element, layout) {
         return !0;
       })(dateStates)
         ? ((html +=
-            '<div class="bootstrap_inside pull-right show-range" style="border: 1px solid #ccc;border-radius: 4px;height: inherit;line-height: 30px;display: block;margin: 0 0 5px 0;padding: 0 6px 0 6px;width: 100%;text-overflow: ellipsis;box-sizing: border-box;vertical-align: middle;">'),
+            '<div class="bootstrap_inside pull-right show-range" style="border: 1px solid #ccc;border-radius: 4px;height: inherit;line-height: 30px;display: block;margin: 0 0 5px 0;padding: 0;width: 100%;text-overflow: ellipsis;box-sizing: border-box;vertical-align: middle;">'),
           (html +=
             '   <i class="lui-icon lui-icon--calendar"></i>&nbsp;<span>'),
           dateStates.rangeStart
