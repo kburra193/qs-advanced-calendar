@@ -465,7 +465,7 @@ export default {
               min: 0,
               max: 20,
               step: 1,
-              defaultValue: 14,
+              defaultValue: 12,
               show: function (e) {
                 return e.props.dropdownfontSize;
               },
