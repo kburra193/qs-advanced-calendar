@@ -110,46 +110,51 @@
       )
         options.template =
           '<div id= "dropDown_' +
-          encoder.encodeForHTML(options.id) + '" class="daterangepicker">' +
+          encoder.encodeForHTML(options.id) +
+          '" class="daterangepicker">' +
           `<div>
           <table>
-          <tbody>
-          <div class="dropdownNew" style="float:left;">
-          <button class="dropbtn">Quick Select</button>
-          <div class="dropdown-content" style="left:0;">
-          <div class="ranges"></div>
-          </div>
-          </div>
-          <tr>
-          <td>
-          <div class="drp-calendar left">
-          <div class="calendar-table"></div>
-          <div class="calendar-time"></div>
-          </div>
-          </td>
-          <td>
-          <div class="drp-calendar right">
-          <div class="calendar-table"></div>
-          <div class="calendar-time"></div>
-          </div>
-          </td>
-          </tr>
-          <tr>
-          </tr>
-          </tbody>
-          <div class="drp-buttons">
-          <span style="float: left;padding: 10px;font-weight: bold;">SELECTIONS</span>
-          <span class="drp-selected-from"></span>
-          <span>   </span>
-          <span class="separatorfromto">-</span>
-          <span>   </span>
-          <span class="drp-selected-to"></span>
-          <button class="cancelBtn" type="button"></button>
-          <button class="applyBtn" disabled="disabled" type="button"></button>
-          </div>
-          </div>
-          </div>
+              <tbody>
+                  <div id="dropdownbtn" class="dropdownNew visible-class" style="float:left;">
+                      <button class="dropbtn">Quick Select</button>
+                      <div class="dropdown-content" style="left:0;">
+                          <div class="ranges"></div>
+                      </div>
+                  </div>
+                  <tr style="display: flex;
+          flex-wrap: wrap;
+          align-content: space-between;
+          justify-content: space-evenly;
+          align-items: stretch;">
+                      <td>
+                          <div class="drp-calendar left">
+                              <div class="calendar-table"></div>
+                              <div class="calendar-time"></div>
+                          </div>
+                      </td>
+                      <td>
+                          <div class="drp-calendar right">
+                              <div class="calendar-table"></div>
+                              <div class="calendar-time"></div>
+                          </div>
+                      </td>
+                  </tr>
+                  <tr>
+                  </tr>
+              </tbody>
+              <div class="drp-buttons">
+                  <span style="float: left;padding: 10px;font-weight: bold;">SELECTIONS</span>
+                  <span class="drp-selected-from"></span>
+                  <span> </span>
+                  <span class="separatorfromto">-</span>
+                  <span> </span>
+                  <span class="drp-selected-to"></span>
+                  <button class="cancelBtn" type="button"></button>
+                  <button class="applyBtn" disabled="disabled" type="button"></button>
+              </div>
           </table>
+      </div>
+      
          
           `;
 
@@ -440,14 +445,14 @@
         for (range in this.ranges) {
           list += '<li data-range-key="' + range + '">' + range + "</li>";
         }
-        if (this.showCustomRangeLabel) {
+        /*    if (this.showCustomRangeLabel) {
           list +=
             '<li data-range-key="' +
             this.locale.customRangeLabel +
             '">' +
             this.locale.customRangeLabel +
             "</li>";
-        }
+        } */
         list += "</ul>";
         this.container.find(".ranges").prepend(list);
       }

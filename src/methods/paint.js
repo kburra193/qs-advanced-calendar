@@ -14,6 +14,8 @@ export default function ($element, layout) {
   var qselectedCount = layout.qListObject.qDimensionInfo.qStateCounts.qSelected;
   var percentSelected = (qselectedCount / qCardinal) * 100;
   var percentAlternative = 100 - percentSelected;
+  var qselectedOption = layout.qListObject.qDimensionInfo.qStateCounts.qOption;
+  var percentOption = (qselectedOption / qCardinal) * 100;
   var defaultTextNew = "";
   if (layout.props.customLabelSwitch == !1 && layout.props.isSingleDate == !0) {
     defaultTextNew = layout.props.defaultText[1];
@@ -41,84 +43,103 @@ export default function ($element, layout) {
   var listObj = self.backendApi.model;
   var defaultSelection = layout.defaultSelection,
     defaultvalue,
-    selectioncount = listObj.layout.qListObject.qDimensionInfo.qStateCounts.qSelected;
+    selectioncount =
+      listObj.layout.qListObject.qDimensionInfo.qStateCounts.qSelected;
   var fieldName = layout.qListObject.qDimensionInfo.qFallbackTitle;
   // if we have defaultSelection, we find the corresponding qElemNumber
   // if there are no currentSelections on the dateField, we apply default selections
   if (defaultSelection && selectioncount == 0 && layout.selectRangeYN == !1) {
-    app.createList({
-      "qDef": { "qFieldDefs": [fieldName] },
-      "qInitialDataFetch": [{ "qHeight": 999, "qWidth": 1 }]
-    }).then(function(listObj) {
-      listObj.searchListObjectFor({
-        qPath: "/qListObjectDef",
-        qMatch: defaultSelection,
-      }).then(function(search) {
-        listObj.getLayout().then(function(layout) {
-          var elNumArray = layout.qListObject.qDataPages[0].qMatrix.map(function(el) {
-            return el[0].qElemNumber;
+    app
+      .createList({
+        qDef: { qFieldDefs: [fieldName] },
+        qInitialDataFetch: [{ qHeight: 999, qWidth: 1 }],
+      })
+      .then(function (listObj) {
+        listObj
+          .searchListObjectFor({
+            qPath: "/qListObjectDef",
+            qMatch: defaultSelection,
+          })
+          .then(function (search) {
+            listObj.getLayout().then(function (layout) {
+              var elNumArray = layout.qListObject.qDataPages[0].qMatrix.map(
+                function (el) {
+                  return el[0].qElemNumber;
+                }
+              );
+              if (elNumArray.length != 0) {
+                listObj.selectListObjectValues(
+                  "/qListObjectDef",
+                  elNumArray,
+                  false
+                );
+              }
+            });
           });
-          if(elNumArray.length != 0){
-            listObj.selectListObjectValues("/qListObjectDef", elNumArray, false);
-          }
-        });
       });
-    });
   }
-  
+
   //logic for custom range dates default selections
   var defaultselectionminDate = layout.props.defaultselectionminDate; //From Date
   var defaultselectionmaxDate = layout.props.defaultselectionmaxDate; //To Date
-  function enumerateDaysBetweenDates (startDate, endDate){
-    let date = []
-    while(moment(startDate) <= moment(endDate)){
+  function enumerateDaysBetweenDates(startDate, endDate) {
+    let date = [];
+    while (moment(startDate) <= moment(endDate)) {
       date.push(startDate);
-      startDate = moment(startDate).add(1, 'days').format(layout.qListObject.qDimensionInfo.qNumFormat.qFmt);
+      startDate = moment(startDate)
+        .add(1, "days")
+        .format(layout.qListObject.qDimensionInfo.qNumFormat.qFmt);
     }
     return date;
   }
-  let defaultselectionrangedateArr = enumerateDaysBetweenDates(defaultselectionminDate, defaultselectionmaxDate);
+  let defaultselectionrangedateArr = enumerateDaysBetweenDates(
+    defaultselectionminDate,
+    defaultselectionmaxDate
+  );
   var data_range = [];
   var multipleselectValues_range = [];
- 
-  if (defaultselectionminDate != '' && defaultselectionmaxDate !='' && layout.selectRangeYN == !0) {
-    app.createList({
-      "qDef": { "qFieldDefs": [fieldName] },
-      "qInitialDataFetch": [{ "qHeight": 999, "qWidth": 1 }]
-    }).then(function(listObj) {
-      layout.qListObject.qDataPages[0].qMatrix.forEach(function (row) {
-        if (row[0].qState === "S") {
-          selected = 1;
-        }
-        data_range.push(row[0]);
-      });
-      for (var i = 0; i < data_range.length; i++) {
-        var text = data_range[i].qText;
-        if (selectioncount == 0) {
-          if (defaultselectionrangedateArr.length > 0) {
-            for (var v = 0; v < defaultselectionrangedateArr.length; v++) {
-              if (data_range[i].qText == defaultselectionrangedateArr[v]) {
-                multipleselectValues_range.push(data_range[i].qElemNumber);
+
+  if (
+    defaultselectionminDate != "" &&
+    defaultselectionmaxDate != "" &&
+    layout.selectRangeYN == !0
+  ) {
+    app
+      .createList({
+        qDef: { qFieldDefs: [fieldName] },
+        qInitialDataFetch: [{ qHeight: 999, qWidth: 1 }],
+      })
+      .then(function (listObj) {
+        layout.qListObject.qDataPages[0].qMatrix.forEach(function (row) {
+          if (row[0].qState === "S") {
+            selected = 1;
+          }
+          data_range.push(row[0]);
+        });
+        for (var i = 0; i < data_range.length; i++) {
+          var text = data_range[i].qText;
+          if (selectioncount == 0) {
+            if (defaultselectionrangedateArr.length > 0) {
+              for (var v = 0; v < defaultselectionrangedateArr.length; v++) {
+                if (data_range[i].qText == defaultselectionrangedateArr[v]) {
+                  multipleselectValues_range.push(data_range[i].qElemNumber);
+                }
+              }
+              if (multipleselectValues_range.length != 0) {
+                listObj.selectListObjectValues({
+                  qPath: "/qListObjectDef",
+                  qValues: multipleselectValues_range,
+                  qToggleMode: false, // true for multi select
+                  //qSoftLock: true,
+                });
               }
             }
-            if(multipleselectValues_range.length != 0){
-              listObj.selectListObjectValues({
-                qPath: "/qListObjectDef",
-                qValues: multipleselectValues_range,
-                qToggleMode: false, // true for multi select
-                //qSoftLock: true,
-              });
-            }
-            
+          } else {
+            multipleselectValues_range.push(data_range[i].qElemNumber);
           }
-        } else {
-          multipleselectValues_range.push(data_range[i].qElemNumber);
         }
-      }
-    });
-  } 
-
-
+      });
+  }
 
   function createDate(num) {
     return moment(86400 * (num - 25569) * 1e3)
@@ -184,7 +205,7 @@ export default function ($element, layout) {
           (html += `</span> <b class="lui-button__caret lui-caret" style="float: right;"></b>
             <div class="state-count-bar" tid="stateCount">
             <div class="state selected" style="width:${percentSelected}%; background-color:${layout.props.selectedBgColor.color}"></div>
-            <div class="state alternative" style="width:${percentAlternative}%; background-color:${layout.props.alternateBgColor.color}"></div>
+            <div class="state option" style="width:${percentOption}%; background-color:#fff"></div>
             </div>
             `),
           (html += "</div>"))
@@ -377,7 +398,6 @@ export default function ($element, layout) {
     let rangesLiteralnew = renameKeys({ true: "Custom Range" }, rangesLiteral);
     config.ranges = rangesLiteralnew;
   }
-
   $element
     .find(".show-range")
     .daterangepicker(config, function (pickStart, pickEnd, label) {
@@ -446,8 +466,10 @@ export default function ($element, layout) {
     });
 
   //Display none for Ranges when button is off
-  if (layout.props.CustomRangesEnabled == !1) {
+  if (layout.props.CustomRangesEnabled == !1 || layout.props.isSingleDate ==!0) {
     $("div.ranges").css("display", "none");
+    $("div.visible-class").css("display", "none");
+
   }
   //Display none for single date
   if (layout.props.isSingleDate == !0) {

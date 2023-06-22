@@ -465,7 +465,7 @@ export default {
               min: 0,
               max: 20,
               step: 1,
-              defaultValue: 12,
+              defaultValue: 11,
               show: function (e) {
                 return e.props.dropdownfontSize;
               },
@@ -1298,11 +1298,15 @@ export default {
         ranges: {
           type: "items",
           label: "Predefined ranges",
-
           items: {
             showPredefinedRanges: {
               type: "items",
               items: {
+                aboutPredefinedRanges: {
+                  component: "text",
+                  label: `Not applicable for Single Date. 
+                      Use Single Date/Interval to switch to Interval for these settings.`,
+                },
                 CustomRangesSwitch: {
                   type: "boolean",
                   component: "switch",

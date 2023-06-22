@@ -520,18 +520,28 @@
   }
 }
 
-.state-count-bar {
+.qv-object-qs-advanced-calendar .state-count-bar {
   border-top-width: 1px;
   flex: 0 0 auto;
   height: 4px;
   background: #a9a9a9;
-  border: 0 solid #ccc;
+  border: 1px solid #ccc;
   width: 100%;
 }
-.state-count-bar .state {
+.qv-object-qs-advanced-calendar .state-count-bar .state {
   float: left;
   height: 100%;
 }
+.qv-object-qs-advanced-calendar .state-count-bar .state.selected {
+  background: #009845 !important;
+}
+.qv-object-qs-advanced-calendar .state-count-bar .state.alternative {
+  background: lightgray !important;
+}
+.qv-object-qs-advanced-calendar .state-count-bar .state.option {
+  background: #fff !important;
+}
+
 #grid .qv-gridcell.zoom,
 .sheet-list #grid .qv-gridcell.zoom {
   z-index: 2 !important;
@@ -638,4 +648,8 @@
 
 .dropdownNew:hover .dropbtn {
   background-color: #3e8e41;
+}
+
+.visible-class {
+  display: block
 }
