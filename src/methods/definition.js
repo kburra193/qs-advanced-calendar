@@ -196,10 +196,10 @@ export default {
                 qStringExpression: "=Max([" + field + "])",
               });
             (data.props.customminDate = {
-              qStringExpression: "",
+              qStringExpression: "=Min( {1} [" + field + "])",
             }),
               (data.props.custommaxDate = {
-                qStringExpression: "",
+                qStringExpression: "=Max( {1} [" + field + "])",
               });
             data.props.defaultselectionminDate = {
               qStringExpression: "",
