@@ -724,7 +724,7 @@ export default {
             cellHeight: {
               type: "number",
               component: "slider",
-              label: "Font Size (px)",
+              label: "Height (px)",
               ref: "props.cellHeight",
               min: 0,
               max: 100,
