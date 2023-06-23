@@ -562,15 +562,25 @@ export default function ($element, layout) {
 #dropDown_${$$scope.qId}.daterangepicker.show-calendar .ranges {
   font-size:  ${layout.props.rangesfontSize}px !important;
   font-weight:  ${layout.props.fontWeight} !important;
-  background:  ${layout.props.rangesBgColor.color} !important;
+  background:  #fbfbfb !important;
   border-style: ${layout.props.rangesborderType} !important;
   border-color: ${layout.props.rangesborderColor.color} !important;
   border-width: ${layout.props.rangesborderWidth}px !important;
   border-radius: ${layout.props.rangesborderRadius}px !important;
-  color: ${layout.props.rangesfontColor.color} !important;
   padding: 5px 12px !important;
   cursor: pointer !important;
 }
+
+#dropDown_${$$scope.qId}.daterangepicker .ranges li {
+  background:  ${layout.props.rangesBgColor.color};
+  color: ${layout.props.rangesfontColor.color};
+}
+
+#dropDown_${$$scope.qId}.daterangepicker .ranges li.active {
+  background-color: #655dc6;
+  color: #fff;
+}
+
 #dropDown_${$$scope.qId}.daterangepicker.show-calendar .drp-buttons {
   font-size:  ${layout.props.footerfontSize}px !important;
   background:  ${layout.props.footerBgColor.color} !important;
