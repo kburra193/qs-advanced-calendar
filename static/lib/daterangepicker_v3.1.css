@@ -410,9 +410,7 @@
 
 .daterangepicker .ranges li {
   opacity: 1;
-  color: rgb(108, 130, 193);
   cursor: pointer;
-  font-size: 13px;
   margin-bottom: 8px;
   background: rgb(245, 245, 245);
   border-width: 1px;
