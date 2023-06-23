@@ -1076,7 +1076,7 @@ export default {
               component: "color-picker",
               type: "object",
               defaultValue: {
-                color: "#595959",
+                color: "#7867ff",
               },
               show: function (e) {
                 return e.props.rangesfontColor;
